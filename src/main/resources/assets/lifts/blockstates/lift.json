@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": {"model": "lifts:block/lift"},
+    "facing=south": {"model": "lifts:block/lift", "y": 180},
+    "facing=east": {"model": "lifts:block/lift", "y": 90},
+    "facing=west": {"model": "lifts:block/lift", "y": 270}
+  }
+}
