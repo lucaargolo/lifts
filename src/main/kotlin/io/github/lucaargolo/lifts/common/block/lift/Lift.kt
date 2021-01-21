@@ -8,7 +8,9 @@ import net.minecraft.block.BlockWithEntity
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.Properties
+import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockView
+import net.minecraft.world.World
 
 class Lift(settings: Settings): BlockWithEntity(settings) {
 
@@ -23,5 +25,14 @@ class Lift(settings: Settings): BlockWithEntity(settings) {
     }
 
     override fun getRenderType(state: BlockState?) = BlockRenderType.MODEL
+
+    override fun hasComparatorOutput(state: BlockState?) = true
+
+    override fun getComparatorOutput(state: BlockState?, world: World, pos: BlockPos?): Int {
+        (world.getBlockEntity(pos) as? LiftBlockEntity)?.let{
+            if(it.isPlatformHere && it.isShaftValid) return 15
+        }
+        return 0
+    }
 
 }

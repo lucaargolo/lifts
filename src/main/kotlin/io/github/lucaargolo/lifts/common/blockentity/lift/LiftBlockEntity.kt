@@ -22,13 +22,13 @@ class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE)
     private val frontPos: BlockPos
         get() = pos.add(facing.vector)
 
-    private val isPlatformHere: Boolean
+    val isPlatformHere: Boolean
         get() {
             val world = world ?: return false
             return !world.getBlockState(frontPos).isAir
         }
 
-    private val isShaftValid: Boolean
+    val isShaftValid: Boolean
         get() {
             var activePlatforms = 0
             liftShaft?.forEach { elevator ->
