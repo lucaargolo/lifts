@@ -2,6 +2,7 @@ package io.github.lucaargolo.lifts.common.blockentity
 
 import io.github.lucaargolo.lifts.common.block.BlockCompendium
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
+import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import io.github.lucaargolo.lifts.utils.RegistryCompendium
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.util.registry.Registry
@@ -10,5 +11,7 @@ import net.minecraft.util.registry.Registry
 object BlockEntityCompendium: RegistryCompendium<BlockEntityType<*>>(Registry.BLOCK_ENTITY_TYPE) {
 
     val LIFT_TYPE = register("lift", BlockEntityType.Builder.create( { LiftBlockEntity(null) }, BlockCompendium.LIFT ).build(null)) as BlockEntityType<LiftBlockEntity>
+    val SCREEN_TYPE = register("screen", BlockEntityType.Builder.create( { ScreenBlockEntity() }, BlockCompendium.SCREEN ).build(null)) as BlockEntityType<ScreenBlockEntity>
+
 
 }
