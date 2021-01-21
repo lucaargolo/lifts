@@ -39,6 +39,8 @@ class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE)
             return activePlatforms == 1
         }
 
+    private var ready = false
+
     override fun markRemoved() {
         liftShaft?.remove(this)
     }
@@ -50,8 +52,12 @@ class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE)
             set.add(this)
             liftShaft = set
         }
-        if(world.isReceivingRedstonePower(pos) && isShaftValid && !isPlatformHere) {
-            val success = liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(world, this) ?: false
+        if(world.isReceivingRedstonePower(pos)) {
+            if(ready && isShaftValid && !isPlatformHere) {
+                ready = liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(world, this) ?: false
+            }
+        }else{
+            ready = true
         }
     }
 
