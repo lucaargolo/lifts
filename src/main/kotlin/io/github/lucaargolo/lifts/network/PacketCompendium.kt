@@ -20,6 +20,7 @@ object PacketCompendium {
             val yaw = buf.readByte()
 
             val tag = buf.readCompoundTag()
+            val finalElevation = buf.readDouble()
 
             client.execute {
                 val world = handler.world
@@ -34,6 +35,9 @@ object PacketCompendium {
                 entity.uuid = uuid
 
                 tag?.let { entity.readBlockMatrixFromTag(tag) }
+
+                entity.initialElevation = y
+                entity.finalElevation = finalElevation
 
                 world.addEntity(id, entity)
             }

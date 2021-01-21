@@ -63,7 +63,10 @@ class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE)
             false
         }else{
             val platform = PlatformEntity(triple.second, triple.third, world)
-            platform.updatePosition(pos.x+0.5, pos.y+0.5, pos.z+0.5)
+            val spawnPos = triple.third
+            platform.updatePosition(spawnPos.x+0.5, spawnPos.y+0.0, spawnPos.z+0.5)
+            platform.initialElevation = spawnPos.y+0.0
+            platform.finalElevation = destination.pos.y+0.0
             world.spawnEntity(platform)
         }
     }
@@ -71,51 +74,24 @@ class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE)
     private fun floodfillPlatformBlocks(world: ServerWorld, block: Block, pos: BlockPos, set: LinkedHashSet<BlockPos>, corner1: BlockPos, corner2: BlockPos): Triple<LinkedHashSet<BlockPos>, BlockPos, BlockPos> {
         var newCorner1 = corner1
         var newCorner2 = corner2
-        if(world.getBlockState(pos).block == block && set.count() <= 25) {
-            if(pos.x > newCorner1.x || pos.y > newCorner1.y) {
+        if(!set.contains(pos) && world.getBlockState(pos).block == block && set.count() <= 25) {
+            set.add(pos)
+            if(pos.x > newCorner1.x || pos.z > newCorner1.z) {
                 newCorner1 = pos
             }
-            if(pos.x < newCorner2.x || pos.y < newCorner2.y) {
+            if(pos.x < newCorner2.x || pos.z < newCorner2.z) {
                 newCorner2 = pos
             }
-            set.add(pos)
-        } else {
-            return Triple(set, newCorner1, newCorner2)
-        }
-        if(!set.contains(pos.north())) {
-            val triple = floodfillPlatformBlocks(world, block, pos.north(), set, newCorner1, newCorner2)
-            if(triple.second.x > newCorner1.x || triple.second.y > newCorner1.y) {
-                newCorner1 = triple.second
-            }
-            if(triple.third.x < newCorner2.x || triple.third.y < newCorner2.y) {
-                newCorner2 = triple.third
-            }
-        }
-        if(!set.contains(pos.south())) {
-            val triple = floodfillPlatformBlocks(world, block, pos.south(), set, newCorner1, newCorner2)
-            if(triple.second.x > newCorner1.x || triple.second.y > newCorner1.y) {
-                newCorner1 = triple.second
-            }
-            if(triple.third.x < newCorner2.x || triple.third.y < newCorner2.y) {
-                newCorner2 = triple.third
-            }
-        }
-        if(!set.contains(pos.east())) {
-            val triple = floodfillPlatformBlocks(world, block, pos.east(), set, newCorner1, newCorner2)
-            if(triple.second.x > newCorner1.x || triple.second.y > newCorner1.y) {
-                newCorner1 = triple.second
-            }
-            if(triple.third.x < newCorner2.x || triple.third.y < newCorner2.y) {
-                newCorner2 = triple.third
-            }
-        }
-        if(!set.contains(pos.west())) {
-            val triple = floodfillPlatformBlocks(world, block, pos.west(), set, newCorner1, newCorner2)
-            if(triple.second.x > newCorner1.x || triple.second.y > newCorner1.y) {
-                newCorner1 = triple.second
-            }
-            if(triple.third.x < newCorner2.x || triple.third.y < newCorner2.y) {
-                newCorner2 = triple.third
+            Direction.values().iterator().forEach {
+                if(it.axis != Direction.Axis.Y) {
+                    val triple = floodfillPlatformBlocks(world, block, pos.add(it.vector), set, newCorner1, newCorner2)
+                    if(triple.second.x > newCorner1.x || triple.second.z > newCorner1.z) {
+                        newCorner1 = triple.second
+                    }
+                    if(triple.third.x < newCorner2.x || triple.third.z < newCorner2.z) {
+                        newCorner2 = triple.third
+                    }
+                }
             }
         }
         return Triple(set, newCorner1, newCorner2)

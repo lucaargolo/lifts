@@ -4,28 +4,31 @@ import io.github.lucaargolo.lifts.common.entity.EntityCompendium
 import io.github.lucaargolo.lifts.network.PacketCompendium
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.fabricmc.fabric.impl.screenhandler.client.ClientNetworking
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.*
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtHelper
 import net.minecraft.network.Packet
 import net.minecraft.util.math.*
 import net.minecraft.world.World
-import kotlin.math.max
-import kotlin.math.min
+import kotlin.math.*
 
 class PlatformEntity: Entity {
 
+    var collidingEntities: List<Entity>? = null
     var blockMatrix: Array<Array<BlockState?>?>? = null
+    var initialElevation = 0.0
+    var finalElevation = 0.0
 
     constructor(entityType: EntityType<PlatformEntity>, world: World): super(entityType, world)
 
     constructor(world: World): super(EntityCompendium.PLATFORM_TYPE, world)
 
-    constructor(pos1: BlockPos, pos2: BlockPos, world: World): super(EntityCompendium.PLATFORM_TYPE, world) {
-        createBlockMatrix(pos1, pos2, true)
+    constructor(pos1: BlockPos, pos2: BlockPos, world: World): this(world) {
+        createBlockMatrix(pos1, pos2)
     }
 
     override fun updatePosition(x: Double, y: Double, z: Double) {
@@ -33,26 +36,51 @@ class PlatformEntity: Entity {
         this.boundingBox = Box(x - 0.5, y, z - 0.5, x + boundingBox.xLength - 0.5, y + boundingBox.yLength, z + boundingBox.zLength - 0.5)
     }
 
+    fun easeInOutSine(x: Double): Double {
+        return -(cos(PI * x) - 1) / 2
+    }
+
     override fun tick() {
-        val validEntities = world.getEntitiesByType<Entity>(null, this.boundingBox.expand(0.5)) { it.isCollidable && it != this}
-        validEntities.forEach {
-            //it.move(MovementType.SELF, Vec3d(0.0, 1.0, 0.0))
-            //it.updatePosition(it.pos.x, it.pos.y+0.005, it.pos.z)
+        val newCollidingEntities = this.world.getEntitiesByType<Entity>(null, this.boundingBox.expand(0.0, 0.3, 0.0)) {it !is PlatformEntity}
+        collidingEntities?.forEach {
+            if(!newCollidingEntities.contains(it)) {
+                it.velocity = this.velocity
+            }
         }
-        //move(MovementType.SELF, Vec3d(0.0, 1.0, 0.0))
-        //updatePosition(pos.x, pos.y+0.005, pos.z)
+        collidingEntities = newCollidingEntities
+        val currentElevation = pos.y
+        val progress = (currentElevation-initialElevation)/(finalElevation - initialElevation)
+        if(progress >= 1.0) {
+            val yPos = removeBlockMatrix()
+            collidingEntities?.forEach {
+                it.teleport(it.pos.x, yPos+1.0, it.pos.z)
+            }
+        }else{
+            val d = if(currentElevation > finalElevation) -1 else 1
+            val p = if(progress <= 0.5) progress else 1-progress
+            val vel = d*easeInOutSine(p)
+            val oldElevation = pos.y
+            move(MovementType.SELF, Vec3d(0.0, vel+(d*0.1), 0.0))
+            val elevationOffset = pos.y - oldElevation
+            collidingEntities?.forEach {
+                it.addVelocity(0.0, elevationOffset-it.velocity.y, 0.0)
+            }
+        }
         super.tick()
     }
 
-    override fun setBoundingBox(boundingBox: Box?) {
-        super.setBoundingBox(boundingBox)
+    private fun removeBlockMatrix(): Int {
+        val yPos = round(pos.y).toInt()
+        blockMatrix?.forEachIndexed { x, row ->
+            row?.forEachIndexed { z, state ->
+                world.setBlockState(BlockPos(blockPos.x+x, yPos, blockPos.z+z), state)
+            }
+        }
+        remove()
+        return yPos
     }
 
-    override fun calculateDimensions() {
-
-    }
-
-    private fun createBlockMatrix(pos1: BlockPos, pos2: BlockPos, destroy: Boolean) {
+    private fun createBlockMatrix(pos1: BlockPos, pos2: BlockPos) {
         val y = pos1.y
 
         val minX = min(pos1.x, pos2.x)
@@ -66,19 +94,33 @@ class PlatformEntity: Entity {
             for(z in (minZ..maxZ)) {
                 val pos = BlockPos(x, y, z)
                 matrixRow[z-minZ] = world.getBlockState(pos)
-                if(destroy) world.setBlockState(pos, Blocks.AIR.defaultState)
+                world.setBlockState(pos, Blocks.AIR.defaultState)
             }
             blockMatrix[x-minX] = matrixRow
         }
 
         this.blockMatrix = blockMatrix
-        this.boundingBox = Box(minX+0.0, y+0.0, minZ+0.0, maxX+1.0, y+1.0, maxZ+1.0)
+        createBoundingBox()
     }
+
+    private fun createBoundingBox() {
+        blockMatrix?.let { matrix ->
+            val xSize = matrix.size
+            val zSize = if(xSize > 0) matrix[0]?.size ?: 0 else 0
+            this.boundingBox = Box(x - 0.5, y, z - 0.5, x + xSize - 0.5, y + 1.0, z + zSize - 0.5)
+        }
+    }
+
+    override fun canAddPassenger(passenger: Entity?) = true
 
     override fun isCollidable() = true
 
-    override fun initDataTracker() {
+    override fun calculateDimensions() { }
 
+    override fun initDataTracker() { }
+
+    override fun moveToBoundingBoxCenter() {
+        setPos(x, boundingBox.minY, z)
     }
 
     fun writeBlockMatrixToTag(tag: CompoundTag) {
@@ -112,6 +154,7 @@ class PlatformEntity: Entity {
             }
         }
         this.blockMatrix = blockMatrix
+        createBoundingBox()
     }
 
     override fun readCustomDataFromTag(tag: CompoundTag) {
@@ -131,6 +174,8 @@ class PlatformEntity: Entity {
         val tag = CompoundTag()
         writeBlockMatrixToTag(tag)
         buf.writeCompoundTag(tag)
+
+        buf.writeDouble(finalElevation)
 
         return ServerPlayNetworking.createS2CPacket(PacketCompendium.SPAWN_PLATFORM_ENTITY, buf)
     }
