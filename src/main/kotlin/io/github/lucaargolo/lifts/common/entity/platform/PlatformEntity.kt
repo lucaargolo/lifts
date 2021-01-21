@@ -48,15 +48,9 @@ class PlatformEntity: Entity {
             }
         }
         collidingEntities = newCollidingEntities
-        val currentElevation = pos.y
-        val progress = (currentElevation-initialElevation)/(finalElevation - initialElevation)
-        if(progress >= 1.0) {
-            val yPos = removeBlockMatrix()
-            collidingEntities?.forEach {
-                it.teleport(it.pos.x, yPos+1.0, it.pos.z)
-            }
-        }else{
-            val d = if(currentElevation > finalElevation) -1 else 1
+        var progress = (pos.y-initialElevation)/(finalElevation - initialElevation)
+        if(progress < 1.0) {
+            val d = if(pos.y > finalElevation) -1 else 1
             val p = if(progress <= 0.5) progress else 1-progress
             val vel = d*easeInOutSine(p)
             val oldElevation = pos.y
@@ -64,6 +58,13 @@ class PlatformEntity: Entity {
             val elevationOffset = pos.y - oldElevation
             collidingEntities?.forEach {
                 it.addVelocity(0.0, elevationOffset-it.velocity.y, 0.0)
+            }
+        }
+        progress = (pos.y-initialElevation)/(finalElevation - initialElevation)
+        if(progress >= 1.0) {
+            val yPos = removeBlockMatrix()
+            collidingEntities?.forEach {
+                it.teleport(it.pos.x, yPos+1.0, it.pos.z)
             }
         }
         super.tick()
