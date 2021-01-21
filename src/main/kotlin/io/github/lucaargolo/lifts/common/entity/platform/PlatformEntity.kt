@@ -44,8 +44,8 @@ class PlatformEntity: Entity {
         val newCollidingEntities = this.world.getEntitiesByType<Entity>(null, this.boundingBox.expand(0.0, 0.3, 0.0)) {it !is PlatformEntity}
         collidingEntities?.forEach {
             if(!newCollidingEntities.contains(it)) {
-                it.velocity = this.velocity
                 it.fallDistance = 0f
+                it.velocity = this.velocity
             }
         }
         collidingEntities = newCollidingEntities
@@ -65,6 +65,7 @@ class PlatformEntity: Entity {
         if(progress >= 1.0) {
             val yPos = removeBlockMatrix()
             collidingEntities?.forEach {
+                it.fallDistance = 0f
                 it.teleport(it.pos.x, yPos+1.0, it.pos.z)
             }
         }
