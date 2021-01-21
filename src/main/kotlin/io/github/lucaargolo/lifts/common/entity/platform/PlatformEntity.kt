@@ -18,7 +18,7 @@ import kotlin.math.*
 
 class PlatformEntity: Entity {
 
-    var collidingEntities: List<Entity>? = null
+    private var collidingEntities: List<Entity>? = null
     var blockMatrix: Array<Array<BlockState?>?>? = null
     var initialElevation = 0.0
     var finalElevation = 0.0
@@ -45,6 +45,7 @@ class PlatformEntity: Entity {
         collidingEntities?.forEach {
             if(!newCollidingEntities.contains(it)) {
                 it.velocity = this.velocity
+                it.fallDistance = 0f
             }
         }
         collidingEntities = newCollidingEntities
@@ -111,8 +112,6 @@ class PlatformEntity: Entity {
             this.boundingBox = Box(x - 0.5, y, z - 0.5, x + xSize - 0.5, y + 1.0, z + zSize - 0.5)
         }
     }
-
-    override fun canAddPassenger(passenger: Entity?) = true
 
     override fun isCollidable() = true
 
