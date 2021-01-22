@@ -4,7 +4,10 @@
   "package": "io.github.lucaargolo.lifts.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [],
-  "client": [],
+  "client": [
+    "MinecraftClientMixin",
+    "MouseMixin"
+  ],
   "injectors": {
     "defaultRequire": 1
   }
