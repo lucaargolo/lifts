@@ -2,6 +2,7 @@ package io.github.lucaargolo.lifts.common.block.screen
 
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gl.Framebuffer
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.state.property.Properties
 import net.minecraft.util.hit.BlockHitResult
@@ -13,6 +14,20 @@ import net.minecraft.world.World
 import kotlin.math.sign
 
 object ScreenBlockHandler {
+
+    var screenFramebuffer: Framebuffer? = null
+
+    fun setupFramebuffer(width: Int, height: Int) {
+        screenFramebuffer = Framebuffer(width, height, true, MinecraftClient.IS_SYSTEM_MAC)
+    }
+
+    fun getFramebufferHeight(): Int {
+        return screenFramebuffer?.textureHeight ?: 0
+    }
+
+    fun getFramebufferWidth(): Int {
+        return screenFramebuffer?.textureWidth ?: 0
+    }
 
     fun openScreenHook(hit: HitResult?, world: World?, screen: Screen?): Boolean {
         if (world != null && hit is BlockHitResult) {
@@ -50,13 +65,13 @@ object ScreenBlockHandler {
         var mouseY = 0.0
         if(hitResult is BlockHitResult && hitResult.blockPos == pos && hitResult.side == facing) {
             mouseX = when(facing) {
-                Direction.NORTH -> (1-ctxPos.x)*256
-                Direction.SOUTH -> (ctxPos.x)*256
-                Direction.EAST -> (1-ctxPos.z)*256
-                Direction.WEST -> (ctxPos.z)*256
+                Direction.NORTH -> (1-ctxPos.x)*getFramebufferWidth()
+                Direction.SOUTH -> (ctxPos.x)*getFramebufferWidth()
+                Direction.EAST -> (1-ctxPos.z)*getFramebufferWidth()
+                Direction.WEST -> (ctxPos.z)*getFramebufferWidth()
                 else -> 0.0
             }
-            mouseY = (1-ctxPos.y)*256
+            mouseY = (1-ctxPos.y)*getFramebufferHeight()
         }
         return Pair(mouseX, mouseY)
     }

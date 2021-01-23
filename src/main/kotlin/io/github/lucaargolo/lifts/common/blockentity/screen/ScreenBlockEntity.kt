@@ -1,8 +1,10 @@
 package io.github.lucaargolo.lifts.common.blockentity.screen
 
+import io.github.lucaargolo.lifts.common.block.screen.ScreenBlockHandler
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gl.Framebuffer
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.util.Tickable
 
@@ -15,7 +17,7 @@ class ScreenBlockEntity: BlockEntity(BlockEntityCompendium.SCREEN_TYPE), Tickabl
     var clickDelay = 0
 
     fun setupScreen(screen: Screen) {
-        screen.init(MinecraftClient.getInstance(), 256, 256)
+        screen.init(MinecraftClient.getInstance(), ScreenBlockHandler.getFramebufferHeight(), ScreenBlockHandler.getFramebufferWidth())
         this.screen = screen
     }
 

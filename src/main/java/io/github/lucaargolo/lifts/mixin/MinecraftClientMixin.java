@@ -2,6 +2,7 @@ package io.github.lucaargolo.lifts.mixin;
 
 import io.github.lucaargolo.lifts.common.block.screen.ScreenBlockHandler;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.RunArgs;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.hit.HitResult;
@@ -23,4 +24,10 @@ public class MinecraftClientMixin {
         boolean shouldCancel = ScreenBlockHandler.INSTANCE.openScreenHook(crosshairTarget, world, screen);
         if(shouldCancel) info.cancel();
     }
+
+    @Inject(at = @At("TAIL"), method = "<init>")
+    public void init(RunArgs args, CallbackInfo info) {
+        ScreenBlockHandler.INSTANCE.setupFramebuffer(512, 512);
+    }
+
 }

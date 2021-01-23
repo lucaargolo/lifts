@@ -81,7 +81,7 @@ class ScreenBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
         modelList.getOrNull(facing.id-2)?.emitFromVanilla(state, context, randomSupplier) {
             it.face.axis == facing.axis || world?.getBlockState(pos.add(it.face.vector))?.block != BlockCompendium.SCREEN
         }
-        context.emitter.drawSide(facing, world, pos)
+        //context.emitter.drawSide(facing, world, pos)
 
         context.popTransform()
     }
@@ -133,16 +133,16 @@ class ScreenBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
         val bl7 = world?.getBlockState(pos.add(side.getDown().vector).add(side.getLeft().vector))?.block != BlockCompendium.SCREEN
         val bl8 = world?.getBlockState(pos.add(side.getDown().vector).add(side.getRight().vector))?.block != BlockCompendium.SCREEN
 
-        if(bl1) draw(side, 15/16f, 1f, 1/16f, 15/16f, 12.99f/16f) //UP
-        if(bl2) draw(side, 15/16f, 1/16f, 1/16f, 0f, 12.99f/16f) //DOWN
-        if(bl3) draw(side, 1f, 15/16f, 15/16f, 1/16f, 12.99f/16f) //LEFT
-        if(bl4) draw(side, 1/16f, 15/16f, 0f, 1/16f, 12.99f/16f) //RIGHT
+        if(bl1) draw(side, 15/16f, 1f, 1/16f, 15/16f, 12.95f/16f) //UP
+        if(bl2) draw(side, 15/16f, 1/16f, 1/16f, 0f, 12.95f/16f) //DOWN
+        if(bl3) draw(side, 1f, 15/16f, 15/16f, 1/16f, 12.95f/16f) //LEFT
+        if(bl4) draw(side, 1/16f, 15/16f, 0f, 1/16f, 12.95f/16f) //RIGHT
 
-        if(bl1 || bl3 || bl5) draw(side, 1f, 1f, 15/16f, 15/16f, 12.99f/16f) //UP_LEFT
-        if(bl1 || bl4 || bl6) draw(side, 1/16f, 1f, 0f, 15/16f, 12.99f/16f) //UP_RIGHT
+        if(bl1 || bl3 || bl5) draw(side, 1f, 1f, 15/16f, 15/16f, 12.95f/16f) //UP_LEFT
+        if(bl1 || bl4 || bl6) draw(side, 1/16f, 1f, 0f, 15/16f, 12.95f/16f) //UP_RIGHT
 
-        if(bl2 || bl3 || bl7) draw(side, 1f, 1/16f, 15/16f, 0f, 12.99f/16f) //DOWN_LEFT
-        if(bl2 || bl4 || bl8) draw(side, 1/16f, 1/16f, 0f, 0f, 12.99f/16f) //DOWN_RIGHT
+        if(bl2 || bl3 || bl7) draw(side, 1f, 1/16f, 15/16f, 0f, 12.95f/16f) //DOWN_LEFT
+        if(bl2 || bl4 || bl8) draw(side, 1/16f, 1/16f, 0f, 0f, 12.95f/16f) //DOWN_RIGHT
 
     }
 
