@@ -27,6 +27,7 @@ import java.util.*
 import java.util.function.Function
 import java.util.function.Supplier
 
+@Suppress("unused", "UNUSED_PARAMETER")
 class ScreenBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
 
     private val modelIdList = mutableListOf(
@@ -81,7 +82,7 @@ class ScreenBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
         modelList.getOrNull(facing.id-2)?.emitFromVanilla(state, context, randomSupplier) {
             it.face.axis == facing.axis || world?.getBlockState(pos.add(it.face.vector))?.block != BlockCompendium.SCREEN
         }
-        //context.emitter.drawSide(facing, world, pos)
+        context.emitter.drawSide(facing, world, pos)
 
         context.popTransform()
     }
@@ -123,15 +124,15 @@ class ScreenBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
     }
 
     private fun QuadEmitter.drawSide(side: Direction, world: BlockRenderView?, pos: BlockPos) {
-        val bl1 = world?.getBlockState(pos.add(side.getUp().vector))?.block != BlockCompendium.SCREEN
-        val bl2 = world?.getBlockState(pos.add(side.getDown().vector))?.block != BlockCompendium.SCREEN
-        val bl3 = world?.getBlockState(pos.add(side.getLeft().vector))?.block != BlockCompendium.SCREEN
-        val bl4 = world?.getBlockState(pos.add(side.getRight().vector))?.block != BlockCompendium.SCREEN
+        val bl1 = true //world?.getBlockState(pos.add(side.getUp().vector))?.block != BlockCompendium.SCREEN
+        val bl2 = true //world?.getBlockState(pos.add(side.getDown().vector))?.block != BlockCompendium.SCREEN
+        val bl3 = true //world?.getBlockState(pos.add(side.getLeft().vector))?.block != BlockCompendium.SCREEN
+        val bl4 = true //world?.getBlockState(pos.add(side.getRight().vector))?.block != BlockCompendium.SCREEN
 
-        val bl5 = world?.getBlockState(pos.add(side.getUp().vector).add(side.getLeft().vector))?.block != BlockCompendium.SCREEN
-        val bl6 = world?.getBlockState(pos.add(side.getUp().vector).add(side.getRight().vector))?.block != BlockCompendium.SCREEN
-        val bl7 = world?.getBlockState(pos.add(side.getDown().vector).add(side.getLeft().vector))?.block != BlockCompendium.SCREEN
-        val bl8 = world?.getBlockState(pos.add(side.getDown().vector).add(side.getRight().vector))?.block != BlockCompendium.SCREEN
+        val bl5 = true //world?.getBlockState(pos.add(side.getUp().vector).add(side.getLeft().vector))?.block != BlockCompendium.SCREEN
+        val bl6 = true //world?.getBlockState(pos.add(side.getUp().vector).add(side.getRight().vector))?.block != BlockCompendium.SCREEN
+        val bl7 = true //world?.getBlockState(pos.add(side.getDown().vector).add(side.getLeft().vector))?.block != BlockCompendium.SCREEN
+        val bl8 = true //world?.getBlockState(pos.add(side.getDown().vector).add(side.getRight().vector))?.block != BlockCompendium.SCREEN
 
         if(bl1) draw(side, 15/16f, 1f, 1/16f, 15/16f, 12.95f/16f) //UP
         if(bl2) draw(side, 15/16f, 1/16f, 1/16f, 0f, 12.95f/16f) //DOWN
