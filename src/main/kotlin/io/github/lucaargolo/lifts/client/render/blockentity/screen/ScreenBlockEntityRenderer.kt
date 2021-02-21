@@ -2,7 +2,7 @@ package io.github.lucaargolo.lifts.client.render.blockentity.screen
 
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
-import io.github.lucaargolo.lifts.client.screen.LiftScreen
+import io.github.lucaargolo.lifts.client.screen.FloorSelectionScreen
 import io.github.lucaargolo.lifts.client.screen.UnlinkedScreen
 import io.github.lucaargolo.lifts.common.block.screen.ScreenBlockHandler
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
@@ -28,7 +28,7 @@ class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockE
                 when(entity.state) {
                     ScreenBlockEntity.State.NO_ENERGY -> null
                     ScreenBlockEntity.State.UNLINKED -> UnlinkedScreen()
-                    ScreenBlockEntity.State.LINKED -> entity.linkedPos?.let{ linkedPos -> (entity.world?.getBlockEntity(linkedPos) as? LiftBlockEntity)?.let { LiftScreen(it) } }
+                    ScreenBlockEntity.State.LINKED -> entity.linkedPos?.let{ linkedPos -> (entity.world?.getBlockEntity(linkedPos) as? LiftBlockEntity)?.let { FloorSelectionScreen(it) } }
                 }?.let { screen ->
                     screen.init(client, framebuffer.textureWidth, framebuffer.textureHeight)
                     entity.screen = screen

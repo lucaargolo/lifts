@@ -6,37 +6,57 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
+import net.minecraft.client.gui.widget.TextFieldWidget
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.LiteralText
 
 class LiftScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText("Lift")) {
 
-    private val buttonLiftReference = linkedMapOf<LiftBlockEntity, ButtonWidget>()
+    private var nameField: TextFieldWidget? = null
+    private var setButton: ButtonWidget? = null
 
     override fun init() {
-        this.buttons.clear()
-        buttonLiftReference.clear()
-        this.blockEntity.liftShaft?.sortedByDescending { it.pos }?.forEachIndexed { index, lift ->
-            val btn = ButtonWidget(10, 10+(index*20), 108, 20, LiteralText(index.toString())) {
-                val buf = PacketByteBufs.create()
-                buf.writeBlockPos(lift.pos)
-                ClientPlayNetworking.send(PacketCompendium.SEND_PLATFORM_ENTITY, buf)
-            }
-            this.addButton(btn)
-            buttonLiftReference[lift] = btn
+        super.init()
+        nameField = TextFieldWidget(textRenderer, (width/2)-60, (height/2)-5, 120, 16, LiteralText(""))
+        nameField?.text = blockEntity.liftName ?: ""
+        nameField?.setMaxLength(16)
+        nameField?.setEditableColor(16777215)
+        this.addChild(nameField)
+        setButton = ButtonWidget((width/2)-61, (height/2)+16, 122, 20, LiteralText("Set name")) {
+            val passedData = PacketByteBufs.create()
+            passedData.writeBlockPos(blockEntity.pos)
+            passedData.writeString(nameField?.text)
+            ClientPlayNetworking.send(PacketCompendium.RENAME_LIFT_ENTITY, passedData)
+            onClose()
         }
+        this.addButton(setButton)
+    }
 
+    override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
+        val nameField = nameField ?: return super.keyPressed(keyCode, scanCode, modifiers)
+        return if (nameField.keyPressed(keyCode, scanCode, modifiers)) true
+        else if (nameField.isFocused && nameField.isVisible && keyCode != 256) true
+        else super.keyPressed(keyCode, scanCode, modifiers)
+    }
+
+    override fun render(matrices: MatrixStack?, mouseX: Int, mouseY: Int, delta: Float) {
+        this.renderBackground(matrices)
+        super.render(matrices, mouseX, mouseY, delta)
+        val text = LiteralText("Please write the desired name: ")
+        textRenderer.draw(matrices, text, (width/2f)-(textRenderer.getWidth(text)/2f), (height/2f)-20, 0xFFFFFF)
+        nameField?.render(matrices, mouseX, mouseY, delta)
     }
 
     override fun tick() {
-        if(this.buttons.size != blockEntity.liftShaft?.size ?: 0) {
-            this.init()
+        nameField?.text?.isEmpty()?.let {
+            if(it) {
+                setButton?.message = LiteralText("Reset name")
+            }else{
+                setButton?.message = LiteralText("Set name")
+            }
         }
-        buttonLiftReference.forEach { (lift, btn) ->
-            btn.active = !lift.isPlatformHere
-        }
-
     }
 
-
+    override fun isPauseScreen() = false
 
 }

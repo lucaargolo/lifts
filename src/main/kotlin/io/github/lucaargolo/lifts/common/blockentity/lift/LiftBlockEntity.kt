@@ -5,6 +5,7 @@ import io.github.lucaargolo.lifts.common.block.lift.Lift
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import io.github.lucaargolo.lifts.common.entity.platform.PlatformEntity
 import net.minecraft.block.Block
+import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.Properties
@@ -12,8 +13,9 @@ import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 
-class LiftBlockEntity(lift: Lift?): SynchronizeableBlockEntity(BlockEntityCompendium.LIFT_TYPE), Tickable {
+class LiftBlockEntity(val lift: Lift?): SynchronizeableBlockEntity(BlockEntityCompendium.LIFT_TYPE), Tickable {
 
+    var liftName: String? = null
     var liftShaft: LinkedHashSet<LiftBlockEntity>? = null
 
     private val facing: Direction
@@ -111,6 +113,11 @@ class LiftBlockEntity(lift: Lift?): SynchronizeableBlockEntity(BlockEntityCompen
         return Triple(set, newCorner1, newCorner2)
     }
 
+    override fun fromTag(state: BlockState?, tag: CompoundTag) {
+        super.fromTag(state, tag)
+        liftName = if(tag.contains("liftName")) tag.getString("liftName") else null
+    }
+
     override fun fromClientTag(tag: CompoundTag) {
         liftShaft = linkedSetOf()
         val shaftLongArray = tag.getLongArray("shaft")
@@ -119,11 +126,17 @@ class LiftBlockEntity(lift: Lift?): SynchronizeableBlockEntity(BlockEntityCompen
             val entity = world?.getBlockEntity(pos) as? LiftBlockEntity
             entity?.let { liftShaft?.add(it) }
         }
+        fromTag(lift?.defaultState, tag)
+    }
+
+    override fun toTag(tag: CompoundTag): CompoundTag {
+        liftName?.let { tag.putString("liftName", it) }
+        return super.toTag(tag)
     }
 
     override fun toClientTag(tag: CompoundTag): CompoundTag {
         val shaftLongArray = liftShaft?.map{it.pos.asLong()}?.toLongArray() ?: longArrayOf()
         tag.putLongArray("shaft", shaftLongArray)
-        return tag
+        return toTag(tag)
     }
 }
