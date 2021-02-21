@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "lifts:item/raw_liftium_ingot"
+  }
+}

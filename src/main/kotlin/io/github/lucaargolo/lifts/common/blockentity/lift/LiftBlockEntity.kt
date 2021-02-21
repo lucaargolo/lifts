@@ -1,20 +1,20 @@
 package io.github.lucaargolo.lifts.common.blockentity.lift
 
+import io.github.lucaargolo.lifts.utils.SynchronizeableBlockEntity
 import io.github.lucaargolo.lifts.common.block.lift.Lift
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import io.github.lucaargolo.lifts.common.entity.platform.PlatformEntity
 import net.minecraft.block.Block
-import net.minecraft.block.entity.BlockEntity
+import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.Properties
 import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.world.World
 
-class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE), Tickable {
+class LiftBlockEntity(lift: Lift?): SynchronizeableBlockEntity(BlockEntityCompendium.LIFT_TYPE), Tickable {
 
-    private var liftShaft: LinkedHashSet<LiftBlockEntity>? = null
+    var liftShaft: LinkedHashSet<LiftBlockEntity>? = null
 
     private val facing: Direction
         get() = cachedState[Properties.HORIZONTAL_FACING]
@@ -39,10 +39,15 @@ class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE)
             return activePlatforms == 1
         }
 
-    private var ready = false
+    var ready = false
 
     override fun markRemoved() {
         liftShaft?.remove(this)
+        if(world?.isClient != true) {
+            liftShaft?.forEach {
+                it.sync()
+            }
+        }
     }
 
     override fun tick() {
@@ -51,6 +56,9 @@ class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE)
             val set = LiftHelper.getOrCreateLiftShaft(pos)
             set.add(this)
             liftShaft = set
+            liftShaft?.forEach {
+                it.sync()
+            }
         }
         if(world.isReceivingRedstonePower(pos)) {
             if(ready && isShaftValid && !isPlatformHere) {
@@ -61,7 +69,7 @@ class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE)
         }
     }
 
-    private fun sendPlatformTo(world: ServerWorld, destination: LiftBlockEntity): Boolean {
+    fun sendPlatformTo(world: ServerWorld, destination: LiftBlockEntity): Boolean {
         val block = world.getBlockState(frontPos).block
         val triple = floodfillPlatformBlocks(world, block, frontPos, linkedSetOf(), frontPos, frontPos)
         val platformBlocks = triple.first
@@ -101,5 +109,21 @@ class LiftBlockEntity(lift: Lift?): BlockEntity(BlockEntityCompendium.LIFT_TYPE)
             }
         }
         return Triple(set, newCorner1, newCorner2)
+    }
+
+    override fun fromClientTag(tag: CompoundTag) {
+        liftShaft = linkedSetOf()
+        val shaftLongArray = tag.getLongArray("shaft")
+        shaftLongArray.forEach { long ->
+            val pos = BlockPos.fromLong(long)
+            val entity = world?.getBlockEntity(pos) as? LiftBlockEntity
+            entity?.let { liftShaft?.add(it) }
+        }
+    }
+
+    override fun toClientTag(tag: CompoundTag): CompoundTag {
+        val shaftLongArray = liftShaft?.map{it.pos.asLong()}?.toLongArray() ?: longArrayOf()
+        tag.putLongArray("shaft", shaftLongArray)
+        return tag
     }
 }

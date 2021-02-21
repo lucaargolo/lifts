@@ -1,5 +1,6 @@
 package io.github.lucaargolo.lifts.common.block
 
+import io.github.lucaargolo.lifts.Lifts.Companion.creativeGroupSettings
 import io.github.lucaargolo.lifts.common.block.lift.Lift
 import io.github.lucaargolo.lifts.common.block.screen.ScreenBlock
 import io.github.lucaargolo.lifts.utils.RegistryCompendium
@@ -18,7 +19,7 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
 
     fun registerBlockItems(itemMap: MutableMap<Identifier, Item>) {
         map.forEach { (identifier, block) ->
-            itemMap[identifier] = BlockItem(block, Item.Settings())
+            itemMap[identifier] = BlockItem(block, creativeGroupSettings())
         }
     }
 

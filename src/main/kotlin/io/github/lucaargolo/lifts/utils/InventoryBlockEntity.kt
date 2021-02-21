@@ -13,7 +13,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Direction
 
-open class InventoryBlockEntity(type: BlockEntityType<*>, size: Int): SidedInventory, BlockEntity(type), BlockEntityClientSerializable {
+open class InventoryBlockEntity(type: BlockEntityType<*>, size: Int): SynchronizeableBlockEntity(type), SidedInventory {
 
     val inventory = DefaultedList.ofSize(size, ItemStack.EMPTY)
     private val availableSlots = (0 until size).toList().toIntArray()
@@ -61,7 +61,5 @@ open class InventoryBlockEntity(type: BlockEntityType<*>, size: Int): SidedInven
         return super.toTag(tag)
     }
 
-    override fun fromClientTag(tag: CompoundTag?) = fromTag(cachedState.block.defaultState, tag)
 
-    override fun toClientTag(tag: CompoundTag?) = toTag(tag)
 }

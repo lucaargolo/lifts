@@ -31,7 +31,7 @@ class ScreenBlock(settings: Settings): BlockWithEntity(settings) {
 
     override fun getOutlineShape(state: BlockState, view: BlockView?, pos: BlockPos?, ePos: ShapeContext?): VoxelShape = getShape(state[Properties.HORIZONTAL_FACING])
 
-    override fun getCollisionShape(state: BlockState, view: BlockView?, pos: BlockPos?, ePos: ShapeContext?): VoxelShape = getShape(state[Properties.HORIZONTAL_FACING])
+    override fun getCollisionShape(state: BlockState, view: BlockView?, pos: BlockPos?, ePos: ShapeContext?): VoxelShape = EMPTY
 
     @Suppress("DEPRECATION")
     override fun onUse(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {

@@ -27,7 +27,7 @@ public class MinecraftClientMixin {
 
     @Inject(at = @At("TAIL"), method = "<init>")
     public void init(RunArgs args, CallbackInfo info) {
-        ScreenBlockHandler.INSTANCE.setupFramebuffer(512, 512);
+        ScreenBlockHandler.INSTANCE.setupFramebuffer(128, 128);
     }
 
 }

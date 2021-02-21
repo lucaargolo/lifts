@@ -2,10 +2,12 @@ package io.github.lucaargolo.lifts.client.render.blockentity.screen
 
 import com.mojang.blaze3d.platform.GlStateManager
 import com.mojang.blaze3d.systems.RenderSystem
+import io.github.lucaargolo.lifts.client.screen.LiftScreen
+import io.github.lucaargolo.lifts.client.screen.UnlinkedScreen
 import io.github.lucaargolo.lifts.common.block.screen.ScreenBlockHandler
+import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gui.screen.TitleScreen
 import net.minecraft.client.render.*
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
 import net.minecraft.client.render.block.entity.BlockEntityRenderer
@@ -16,11 +18,22 @@ import net.minecraft.util.math.Direction
 
 class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockEntityRenderer<ScreenBlockEntity>(dispatcher) {
 
+    @Suppress("DEPRECATION")
     override fun render(entity: ScreenBlockEntity, tickDelta: Float, matrices: MatrixStack, vertexConsumers: VertexConsumerProvider, light: Int, overlay: Int) {
         val framebuffer = ScreenBlockHandler.screenFramebuffer ?: return
+        val client = MinecraftClient.getInstance()
 
-        if(!entity.isScreenSetup) {
-            entity.setupScreen(TitleScreen())
+        when(entity.screen) {
+            null -> {
+                when(entity.state) {
+                    ScreenBlockEntity.State.NO_ENERGY -> null
+                    ScreenBlockEntity.State.UNLINKED -> UnlinkedScreen()
+                    ScreenBlockEntity.State.LINKED -> entity.linkedPos?.let{ linkedPos -> (entity.world?.getBlockEntity(linkedPos) as? LiftBlockEntity)?.let { LiftScreen(it) } }
+                }?.let { screen ->
+                    screen.init(client, framebuffer.textureWidth, framebuffer.textureHeight)
+                    entity.screen = screen
+                }
+            }
         }
 
         val facing = entity.cachedState[Properties.HORIZONTAL_FACING]
@@ -29,7 +42,8 @@ class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockE
 
         framebuffer.beginWrite(true)
 
-        RenderSystem.clear(256, MinecraftClient.IS_SYSTEM_MAC)
+        RenderSystem.clearColor(0.0f, 0.0f, 0.0f, 1.0f)
+        RenderSystem.clear(16384, MinecraftClient.IS_SYSTEM_MAC)
         RenderSystem.matrixMode(5889)
         RenderSystem.pushMatrix()
         RenderSystem.loadIdentity()
@@ -39,7 +53,7 @@ class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockE
         RenderSystem.loadIdentity()
         RenderSystem.translatef(0.0f, 0.0f, -2000.0f)
         RenderSystem.fogMode(GlStateManager.FogMode.EXP2)
-        entity.screen?.render(MatrixStack(), mousePos.first.toInt(), mousePos.second.toInt(), MinecraftClient.getInstance().lastFrameDuration)
+        entity.screen?.render(MatrixStack(), mousePos.first.toInt(), mousePos.second.toInt(), client.lastFrameDuration)
         RenderSystem.fogMode(GlStateManager.FogMode.LINEAR)
         RenderSystem.matrixMode(5888)
         RenderSystem.popMatrix()
@@ -50,7 +64,7 @@ class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockE
 
         framebuffer.endWrite()
 
-        MinecraftClient.getInstance().framebuffer.beginWrite(true)
+        client.framebuffer.beginWrite(true)
 
         matrices.push()
         matrices.translate(0.5, 0.5, 0.5)
@@ -65,7 +79,6 @@ class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockE
         matrices.scale(1f/framebuffer.textureWidth, 1f/framebuffer.textureHeight, 1f)
 
         framebuffer.beginRead()
-
 
         val bufferBuilder = Tessellator.getInstance().buffer
         val matrix = matrices.peek().model

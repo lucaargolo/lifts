@@ -1,36 +1,78 @@
 package io.github.lucaargolo.lifts.common.blockentity.screen
 
-import io.github.lucaargolo.lifts.common.block.screen.ScreenBlockHandler
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
-import io.github.lucaargolo.lifts.utils.InventoryBlockEntity
-import net.fabricmc.fabric.api.block.entity.BlockEntityClientSerializable
-import net.minecraft.block.entity.BlockEntity
-import net.minecraft.client.MinecraftClient
-import net.minecraft.client.gl.Framebuffer
+import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
+import io.github.lucaargolo.lifts.utils.Linkable
+import io.github.lucaargolo.lifts.utils.SynchronizeableBlockEntity
+import net.minecraft.block.BlockState
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.item.ItemStack
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.Tickable
-import net.minecraft.util.collection.DefaultedList
+import net.minecraft.util.math.BlockPos
 
-class ScreenBlockEntity: InventoryBlockEntity(BlockEntityCompendium.SCREEN_TYPE, 9), Tickable {
+class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN_TYPE), Linkable, Tickable {
 
-    val isScreenSetup
-        get() = screen != null
+    enum class State {
+        NO_ENERGY,
+        UNLINKED,
+        LINKED
+    }
+
+    var state = State.UNLINKED
+        set(value) {
+            screen = null
+            field = value
+        }
+
+    var linkedPos: BlockPos? = null
+
+    override fun link(blockPos: BlockPos): Boolean {
+        if(world?.getBlockEntity(blockPos) is LiftBlockEntity) {
+            linkedPos = blockPos
+            state = State.LINKED
+            return true
+        }
+        return false
+    }
 
     var screen: Screen? = null
     var clickDelay = 0
-
-    fun setupScreen(screen: Screen) {
-        screen.init(MinecraftClient.getInstance(), ScreenBlockHandler.getFramebufferHeight(), ScreenBlockHandler.getFramebufferWidth())
-        this.screen = screen
-    }
+    var tickDelay = 0
 
     override fun tick() {
         if(clickDelay > 0) {
             clickDelay--
         }
+        if(tickDelay > 20) {
+            if(state == State.LINKED && linkedPos?.let { world?.getBlockEntity(it) } !is LiftBlockEntity) {
+                linkedPos = null
+                state = State.UNLINKED
+            }
+            tickDelay = 0
+        }else{
+            tickDelay++
+        }
         screen?.tick()
+    }
+
+    override fun toTag(tag: CompoundTag): CompoundTag {
+        linkedPos?.let { tag.putLong("linkedPos", it.asLong()) }
+        tag.putString("state", state.name)
+        return super.toTag(tag)
+    }
+
+    override fun fromTag(blockState: BlockState, tag: CompoundTag) {
+        super.fromTag(blockState, tag)
+        linkedPos = if(tag.contains("linkedPos")) {
+            BlockPos.fromLong(tag.getLong("linkedPos"))
+        } else { null }
+        state = try {
+            State.valueOf(tag.getString("state"))
+        } catch(e: Exception) {
+            e.printStackTrace()
+            State.NO_ENERGY
+        }
+        println(state.name)
     }
 
 }

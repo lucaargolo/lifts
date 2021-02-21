@@ -18,7 +18,7 @@ object ScreenBlockHandler {
     var screenFramebuffer: Framebuffer? = null
 
     fun setupFramebuffer(width: Int, height: Int) {
-        screenFramebuffer = Framebuffer(width, height, true, MinecraftClient.IS_SYSTEM_MAC)
+        screenFramebuffer = Framebuffer(width, height, false, MinecraftClient.IS_SYSTEM_MAC)
     }
 
     fun getFramebufferHeight(): Int {
@@ -34,7 +34,10 @@ object ScreenBlockHandler {
             val pos = hit.blockPos
             (world.getBlockEntity(pos) as? ScreenBlockEntity)?.let{ blockEntity ->
                 if (blockEntity.clickDelay == 5) {
-                    screen?.let { blockEntity.setupScreen(it) }
+                    screen?.let {
+                        it.init(MinecraftClient.getInstance(), getFramebufferWidth(), getFramebufferHeight())
+                        blockEntity.screen = it
+                    }
                     return true
                 }
             }
