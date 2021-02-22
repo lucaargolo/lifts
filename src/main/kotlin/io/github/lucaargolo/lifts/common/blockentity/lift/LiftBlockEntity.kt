@@ -6,9 +6,11 @@ import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import io.github.lucaargolo.lifts.common.entity.platform.PlatformEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.Properties
+import net.minecraft.util.ItemScatterer
 import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
@@ -56,6 +58,16 @@ class LiftBlockEntity(val lift: Lift?): SynchronizeableBlockEntity(BlockEntityCo
         val world: ServerWorld = world as? ServerWorld ?: return
         if(liftShaft == null) {
             val set = LiftHelper.getOrCreateLiftShaft(pos)
+            set.firstOrNull()?.facing?.let {
+                if(it != facing)  {
+                    val stacks = Block.getDroppedStacks(cachedState, world, pos, this)
+                    stacks.forEach {
+                        ItemScatterer.spawn(world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it)
+                    }
+                    world.setBlockState(pos, Blocks.AIR.defaultState)
+                    return
+                }
+            }
             set.add(this)
             liftShaft = set
             liftShaft?.forEach {
@@ -72,8 +84,11 @@ class LiftBlockEntity(val lift: Lift?): SynchronizeableBlockEntity(BlockEntityCo
     }
 
     fun sendPlatformTo(world: ServerWorld, destination: LiftBlockEntity): Boolean {
-        val block = world.getBlockState(frontPos).block
-        val triple = floodfillPlatformBlocks(world, block, frontPos, linkedSetOf(), frontPos, frontPos)
+        val state = world.getBlockState(frontPos)
+        if(!state.isFullCube(world, frontPos)) {
+            return false
+        }
+        val triple = floodfillPlatformBlocks(world, state, frontPos, linkedSetOf(), frontPos, frontPos)
         val platformBlocks = triple.first
         return if(platformBlocks.count() > 25) {
             false
@@ -87,10 +102,10 @@ class LiftBlockEntity(val lift: Lift?): SynchronizeableBlockEntity(BlockEntityCo
         }
     }
 
-    private fun floodfillPlatformBlocks(world: ServerWorld, block: Block, pos: BlockPos, set: LinkedHashSet<BlockPos>, corner1: BlockPos, corner2: BlockPos): Triple<LinkedHashSet<BlockPos>, BlockPos, BlockPos> {
+    private fun floodfillPlatformBlocks(world: ServerWorld, state: BlockState, pos: BlockPos, set: LinkedHashSet<BlockPos>, corner1: BlockPos, corner2: BlockPos): Triple<LinkedHashSet<BlockPos>, BlockPos, BlockPos> {
         var newCorner1 = corner1
         var newCorner2 = corner2
-        if(!set.contains(pos) && world.getBlockState(pos).block == block && set.count() <= 25) {
+        if(!set.contains(pos) && world.getBlockState(pos) == state && set.count() <= 25) {
             set.add(pos)
             if(pos.x > newCorner1.x || pos.z > newCorner1.z) {
                 newCorner1 = pos
@@ -100,7 +115,7 @@ class LiftBlockEntity(val lift: Lift?): SynchronizeableBlockEntity(BlockEntityCo
             }
             Direction.values().iterator().forEach {
                 if(it.axis != Direction.Axis.Y) {
-                    val triple = floodfillPlatformBlocks(world, block, pos.add(it.vector), set, newCorner1, newCorner2)
+                    val triple = floodfillPlatformBlocks(world, state, pos.add(it.vector), set, newCorner1, newCorner2)
                     if(triple.second.x > newCorner1.x || triple.second.z > newCorner1.z) {
                         newCorner1 = triple.second
                     }

@@ -25,9 +25,8 @@ class PlatformEntityRenderer(dispatcher: EntityRenderDispatcher): EntityRenderer
                     val blockPos = BlockPos(entity.x, entity.boundingBox.maxY, entity.z)
                     matrices.translate(x-0.5, 0.0, z-0.5)
                     val blockRenderManager = MinecraftClient.getInstance().blockRenderManager
-                    blockRenderManager.modelRenderer.render(world, blockRenderManager.getModel(blockState), blockState, blockPos, matrices, vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(blockState)), false, Random(), blockState.getRenderingSeed(blockPos), OverlayTexture.DEFAULT_UV)
+                    blockRenderManager.modelRenderer.renderFlat(world, blockRenderManager.getModel(blockState), blockState, blockPos, matrices, vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(blockState)), false, Random(), blockState.getRenderingSeed(blockPos), OverlayTexture.DEFAULT_UV)
                     matrices.pop()
-                    super.render(entity, yaw, tickDelta, matrices, vertexConsumers, light)
                 }
             }
         }

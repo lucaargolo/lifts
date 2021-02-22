@@ -4,14 +4,15 @@ import io.github.lucaargolo.lifts.common.entity.EntityCompendium
 import io.github.lucaargolo.lifts.network.PacketCompendium
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
+import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.*
-import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtHelper
 import net.minecraft.network.Packet
+import net.minecraft.server.world.ServerWorld
+import net.minecraft.util.ItemScatterer
 import net.minecraft.util.math.*
 import net.minecraft.world.World
 import kotlin.math.*
@@ -22,6 +23,8 @@ class PlatformEntity: Entity {
     var blockMatrix: Array<Array<BlockState?>?>? = null
     var initialElevation = 0.0
     var finalElevation = 0.0
+    var lastProgress = -9999.0
+    var sameLastProgress = 0.0
 
     constructor(entityType: EntityType<PlatformEntity>, world: World): super(entityType, world)
 
@@ -52,16 +55,29 @@ class PlatformEntity: Entity {
         var progress = (pos.y-initialElevation)/(finalElevation - initialElevation)
         if(progress < 1.0) {
             val d = if(pos.y > finalElevation) -1 else 1
+            val h = abs(finalElevation-initialElevation)
             val p = if(progress <= 0.5) progress else 1-progress
-            val vel = d*easeInOutSine(p)
+            val e = min(p*(1/(5/h)), 1.0)
+            val vel = d*easeInOutSine(e)
             val oldElevation = pos.y
-            move(MovementType.SELF, Vec3d(0.0, vel+(d*0.1), 0.0))
+            move(MovementType.SELF, Vec3d(0.0, (vel+(d*0.1))*0.5, 0.0))
             val elevationOffset = pos.y - oldElevation
             collidingEntities?.forEach {
                 it.addVelocity(0.0, elevationOffset-it.velocity.y, 0.0)
             }
         }
         progress = (pos.y-initialElevation)/(finalElevation - initialElevation)
+        if(progress == lastProgress) {
+            if(sameLastProgress++ >= 3) {
+                val yPos = removeBlockMatrix()
+                collidingEntities?.forEach {
+                    it.fallDistance = 0f
+                    it.teleport(it.pos.x, yPos+1.0, it.pos.z)
+                }
+            }
+        }else{
+            lastProgress = progress
+        }
         if(progress >= 1.0) {
             val yPos = removeBlockMatrix()
             collidingEntities?.forEach {
@@ -76,7 +92,17 @@ class PlatformEntity: Entity {
         val yPos = round(pos.y).toInt()
         blockMatrix?.forEachIndexed { x, row ->
             row?.forEachIndexed { z, state ->
-                world.setBlockState(BlockPos(blockPos.x+x, yPos, blockPos.z+z), state)
+                val pos = BlockPos(blockPos.x+x, yPos, blockPos.z+z)
+                if(world.getBlockState(pos).isAir) {
+                    world.setBlockState(pos, state)
+                }else{
+                    (world as? ServerWorld)?.let { serverWorld ->
+                        val stacks = Block.getDroppedStacks(state, serverWorld, pos, null)
+                        stacks.forEach {
+                            ItemScatterer.spawn(world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it)
+                        }
+                    }
+                }
             }
         }
         remove()
@@ -96,8 +122,13 @@ class PlatformEntity: Entity {
             val matrixRow = arrayOfNulls<BlockState>((maxZ-minZ)+1)
             for(z in (minZ..maxZ)) {
                 val pos = BlockPos(x, y, z)
-                matrixRow[z-minZ] = world.getBlockState(pos)
-                world.setBlockState(pos, Blocks.AIR.defaultState)
+                val state = world.getBlockState(pos)
+                matrixRow[z - minZ] = if(state.isFullCube(world, pos)) {
+                    world.setBlockState(pos, Blocks.AIR.defaultState)
+                    state
+                }else{
+                    Blocks.AIR.defaultState
+                }
             }
             blockMatrix[x-minX] = matrixRow
         }
