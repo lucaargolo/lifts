@@ -18,9 +18,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
-class Lift(settings: Settings): BlockWithEntity(settings) {
-
-    override fun createBlockEntity(world: BlockView?) = LiftBlockEntity(this)
+abstract class Lift(settings: Settings, val platformSpeed: Double, val platformRange: Int): BlockWithEntity(settings) {
 
     override fun onUse(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
         if(world.isClient) {

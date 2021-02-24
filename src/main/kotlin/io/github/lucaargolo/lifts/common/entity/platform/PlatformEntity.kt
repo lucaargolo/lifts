@@ -21,6 +21,7 @@ class PlatformEntity: Entity {
 
     private var collidingEntities: List<Entity>? = null
     var blockMatrix: Array<Array<BlockState?>?>? = null
+    var speed = 1.0
     var initialElevation = 0.0
     var finalElevation = 0.0
     var lastProgress = -9999.0

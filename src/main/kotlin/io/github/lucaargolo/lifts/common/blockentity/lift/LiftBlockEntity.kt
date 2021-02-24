@@ -7,6 +7,7 @@ import io.github.lucaargolo.lifts.common.entity.platform.PlatformEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.Properties
@@ -14,8 +15,9 @@ import net.minecraft.util.ItemScatterer
 import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.MathHelper
 
-class LiftBlockEntity(val lift: Lift?): SynchronizeableBlockEntity(BlockEntityCompendium.LIFT_TYPE), Tickable {
+abstract class LiftBlockEntity(type: BlockEntityType<LiftBlockEntity>, val lift: Lift?): SynchronizeableBlockEntity(type), Tickable {
 
     var liftName: String? = null
     var liftShaft: LinkedHashSet<LiftBlockEntity>? = null
@@ -83,9 +85,13 @@ class LiftBlockEntity(val lift: Lift?): SynchronizeableBlockEntity(BlockEntityCo
         }
     }
 
-    fun sendPlatformTo(world: ServerWorld, destination: LiftBlockEntity): Boolean {
+    open fun sendPlatformTo(world: ServerWorld, destination: LiftBlockEntity): Boolean {
         val state = world.getBlockState(frontPos)
         if(!state.isFullCube(world, frontPos)) {
+            return false
+        }
+        val distance = MathHelper.abs(destination.pos.y - this.pos.y)
+        if(distance > lift?.platformRange ?: 0) {
             return false
         }
         val triple = floodfillPlatformBlocks(world, state, frontPos, linkedSetOf(), frontPos, frontPos)
@@ -96,6 +102,7 @@ class LiftBlockEntity(val lift: Lift?): SynchronizeableBlockEntity(BlockEntityCo
             val platform = PlatformEntity(triple.second, triple.third, world)
             val spawnPos = triple.third
             platform.updatePosition(spawnPos.x+0.5, spawnPos.y+0.0, spawnPos.z+0.5)
+            platform.speed = lift?.platformSpeed ?: 0.0
             platform.initialElevation = spawnPos.y+0.0
             platform.finalElevation = destination.pos.y+0.0
             world.spawnEntity(platform)
