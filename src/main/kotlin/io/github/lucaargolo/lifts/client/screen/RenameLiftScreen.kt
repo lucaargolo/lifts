@@ -10,7 +10,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.LiteralText
 
-class LiftScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText("Lift")) {
+class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText("Lift")) {
 
     private var nameField: TextFieldWidget? = null
     private var setButton: ButtonWidget? = null

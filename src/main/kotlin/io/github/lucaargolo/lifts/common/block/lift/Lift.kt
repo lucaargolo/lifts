@@ -1,6 +1,6 @@
 package io.github.lucaargolo.lifts.common.block.lift
 
-import io.github.lucaargolo.lifts.client.screen.LiftScreen
+import io.github.lucaargolo.lifts.client.screen.RenameLiftScreen
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockRenderType
@@ -15,7 +15,6 @@ import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
 abstract class Lift(settings: Settings, val platformSpeed: Double, val platformRange: Int): BlockWithEntity(settings) {
@@ -23,7 +22,7 @@ abstract class Lift(settings: Settings, val platformSpeed: Double, val platformR
     override fun onUse(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
         if(world.isClient) {
             (world.getBlockEntity(pos) as? LiftBlockEntity)?.let {
-                MinecraftClient.getInstance().openScreen(LiftScreen(it))
+                MinecraftClient.getInstance().openScreen(RenameLiftScreen(it))
             }
         }
         return ActionResult.SUCCESS
