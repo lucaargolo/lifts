@@ -18,7 +18,7 @@ import team.reborn.energy.EnergyTier
 
 object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
 
-    val STIRLING_LIFT = register("stirling_lift", StirlingLift(AbstractBlock.Settings.copy(Blocks.FURNACE), 1.0, 16))
+    val STIRLING_LIFT = register("stirling_lift", StirlingLift(AbstractBlock.Settings.copy(Blocks.COBBLESTONE), 1.0, 16))
 
     val ELECTRIC_LIFT_MK1 = register("electric_lift_mk1", ElectricLift(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK), 1.2, 32, 32000.0, EnergyTier.LOW))
     val ELECTRIC_LIFT_MK2 = register("electric_lift_mk2", ElectricLift(AbstractBlock.Settings.copy(Blocks.GOLD_BLOCK), 1.4, 64, 64000.0, EnergyTier.MEDIUM))

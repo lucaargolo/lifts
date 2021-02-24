@@ -17,7 +17,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 
-abstract class LiftBlockEntity(type: BlockEntityType<LiftBlockEntity>, val lift: Lift?): SynchronizeableBlockEntity(type), Tickable {
+abstract class LiftBlockEntity(type: BlockEntityType<*>, val lift: Lift?): SynchronizeableBlockEntity(type), Tickable {
 
     var liftName: String? = null
     var liftShaft: LinkedHashSet<LiftBlockEntity>? = null
