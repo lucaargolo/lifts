@@ -7,6 +7,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.minecraft.client.gui.DrawableHelper
 import net.minecraft.client.gui.screen.Screen
+import net.minecraft.client.gui.widget.AbstractButtonWidget
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.LiteralText
@@ -35,7 +36,7 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(null) {
         excessHeight = 0.0
         scrollable = false
 
-        this.blockEntity.liftShaft?.sortedByDescending { it.pos }?.forEachIndexed { index, lift ->
+        this.blockEntity.liftShaft?.lifts?.forEachIndexed { index, lift ->
             val btn = ButtonWidget(10, 10+(index*20), if(scrollable) 100 else 108, 20, getFloorName(index, lift), {
                 val buf = PacketByteBufs.create()
                 buf.writeBlockPos(lift.pos)
@@ -72,7 +73,7 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(null) {
 
     override fun mouseScrolled(mouseX: Double, mouseY: Double, amount: Double): Boolean {
         if(scrollable) {
-            scrollableOffset -= amount*2
+            scrollableOffset -= amount*4
             scrollableOffset = MathHelper.clamp(scrollableOffset, 0.0, excessHeight)
             updateButtonsHeight()
             return true
@@ -81,8 +82,12 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(null) {
     }
 
     override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
-        super.render(matrices, mouseX, mouseY, delta)
         if(scrollable) {
+            buttons.forEach { btn ->
+                if((-20..120).contains(btn.y)) {
+                    btn.render(matrices, mouseX, mouseY, delta)
+                }
+            }
             client?.textureManager?.bindTexture(scrollTexture)
             drawTexture(matrices, 110, 10, 93f, 17f, 8, 107, 512, 256)
             drawTexture(matrices, 110, 117, 93f, 158f, 8, 1, 512, 256)
@@ -91,6 +96,8 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(null) {
             val offset = MathHelper.lerp(scrollableOffset/excessHeight, 0.0, 99.0)
             drawTexture(matrices, 111, 11+offset.toInt(), 0f, 199f, 6, 6, 512, 256)
             drawTexture(matrices, 111, 17+offset.toInt(), 0f, 225f, 6, 1, 512, 256)
+        }else{
+            super.render(matrices, mouseX, mouseY, delta)
         }
     }
 
@@ -103,11 +110,8 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(null) {
             if(lift.isPlatformHere) {
                 btn.active = false
                 tooltipBtnReference[btn] = TranslatableText("screen.tooltip.already_here")
-            }else if(!lift.isShaftValid) {
-                btn.active = false
-                tooltipBtnReference[btn] = TranslatableText("screen.tooltip.invalid_shaft")
             }else{
-                val actionResult = client?.world?.let { world -> blockEntity.liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(world, lift, true) }
+                val actionResult = client?.world?.let { world -> blockEntity.liftShaft?.sendPlatformTo(world, lift, true) }
                 if(actionResult?.isAccepted() == false) {
                     btn.active = false
                     tooltipBtnReference[btn] = TranslatableText("screen.tooltip.${actionResult.name.toLowerCase()}")

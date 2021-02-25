@@ -11,8 +11,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.screen.PropertyDelegate
 import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
-import net.minecraft.world.World
 
 class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LIFT_TYPE), SidedInventory {
 
@@ -72,6 +70,7 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
                 if(burningTicks == 0) {
                     burningTime = 0
                 }
+                markDirty()
             }
         }
         super.tick()
@@ -81,18 +80,15 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
         return if(fuel.isEmpty) 0 else FuelRegistry.INSTANCE.get(fuel.item)
     }
 
-    override fun sendPlatformTo(world: World, destination: LiftBlockEntity, simulation: Boolean): LiftActionResult {
-        val distance = MathHelper.abs(destination.pos.y - this.pos.y)
+    override fun preSendRequirements(distance: Int): LiftActionResult {
         val cost = TICKS_PER_BLOCK * distance
-        if(storedTicks - cost >= 0) {
-            val result = super.sendPlatformTo(world, destination, simulation)
-            if(result.isAccepted() && !simulation) {
-                storedTicks -= cost
-                sync()
-            }
-            return result
-        }
-        return LiftActionResult.NO_FUEL
+        return if(storedTicks - cost >= 0) LiftActionResult.SUCCESSFUL else LiftActionResult.NO_FUEL
+    }
+
+    override fun postSendRequirements(distance: Int) {
+        val cost = TICKS_PER_BLOCK * distance
+        storedTicks -= cost
+        markDirty()
     }
 
     override fun canPlayerUse(player: PlayerEntity): Boolean {

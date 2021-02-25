@@ -20,20 +20,9 @@ import net.minecraft.world.World
 
 abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEntity(type), Tickable {
 
-    enum class LiftActionResult {
-        INVALID_PLATFORM,
-        NO_PLATFORM,
-        NO_RANGE,
-        NO_ENERGY,
-        NO_FUEL,
-        SUCCESSFUL;
-
-        fun isAccepted() = this == SUCCESSFUL
-    }
-
     var lift: Lift? = null
     var liftName: String? = null
-    var liftShaft: LinkedHashSet<LiftBlockEntity>? = null
+    var liftShaft: LiftShaft? = null
 
     private val facing: Direction
         get() = cachedState[Properties.HORIZONTAL_FACING]
@@ -41,60 +30,55 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEn
     private val frontPos: BlockPos
         get() = pos.add(facing.vector)
 
+    private var isPlatformHereCache: Boolean? = null
+
     val isPlatformHere: Boolean
-        get() {
-            val world = world ?: return false
-            return !world.getBlockState(frontPos).isAir
+        get() = isPlatformHereCache ?: let {
+            val result = world?.getBlockState(frontPos)?.isAir?.not() ?: false
+            isPlatformHereCache = result
+            result
         }
 
-    val isShaftValid: Boolean
-        get() {
-            var activePlatforms = 0
-            liftShaft?.forEach { elevator ->
-                if(elevator.isPlatformHere) {
-                    activePlatforms++
-                }
-            }
-            return activePlatforms == 1
-        }
 
     var ready = false
 
-    override fun markRemoved() {
-        liftShaft?.remove(this)
-        if(world?.isClient != true) {
-            liftShaft?.forEach {
-                it.sync()
-            }
-        }
+    fun resetPlatformCache() {
+        isPlatformHereCache = null
     }
+
+    override fun markDirty() {
+        liftShaft?.markEntityDirty(this)
+    }
+
+    override fun markRemoved() {
+        liftShaft?.removeLift(this)
+    }
+
+    abstract fun preSendRequirements(distance: Int): LiftActionResult
+    abstract fun postSendRequirements(distance: Int)
 
     override fun tick() {
         if(lift == null) {
             lift = world?.getBlockState(pos)?.block as? Lift
         }
-        val world: ServerWorld = world as? ServerWorld ?: return
         if(liftShaft == null) {
-            val set = LiftHelper.getOrCreateLiftShaft(pos)
-            set.firstOrNull()?.facing?.let {
-                if(it != facing)  {
-                    val stacks = Block.getDroppedStacks(cachedState, world, pos, this)
+            liftShaft = LiftShaft.getOrCreate(pos)
+            if(liftShaft?.facing != null && facing != liftShaft?.facing)  {
+                (world as? ServerWorld)?.let { serverWorld ->
+                    val stacks = Block.getDroppedStacks(cachedState, serverWorld, pos, this)
                     stacks.forEach {
-                        ItemScatterer.spawn(world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it)
+                        ItemScatterer.spawn(serverWorld, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it)
                     }
-                    world.setBlockState(pos, Blocks.AIR.defaultState)
-                    return
                 }
+                world?.setBlockState(pos, Blocks.AIR.defaultState)
+                return
             }
-            set.add(this)
-            liftShaft = set
-            liftShaft?.forEach {
-                it.sync()
-            }
+            liftShaft?.addLift(this)
         }
+        val world = world as? ServerWorld ?: return
         if(world.isReceivingRedstonePower(pos)) {
-            if(ready && isShaftValid && !isPlatformHere) {
-                val actionResult = liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(world, this, false)
+            if(ready && !isPlatformHere) {
+                val actionResult = liftShaft?.sendPlatformTo(world, this, false)
                 ready = actionResult?.isAccepted() ?: false
             }
         }else{
@@ -102,73 +86,9 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEn
         }
     }
 
-    open fun sendPlatformTo(world: World, destination: LiftBlockEntity, simulation: Boolean): LiftActionResult {
-        val state = world.getBlockState(frontPos)
-        if(!state.isFullCube(world, frontPos)) {
-            return LiftActionResult.INVALID_PLATFORM
-        }
-        val distance = MathHelper.abs(destination.pos.y - this.pos.y)
-        if(distance > lift?.platformRange ?: 0) {
-            return LiftActionResult.NO_RANGE
-        }
-        val triple = floodfillPlatformBlocks(world, state, frontPos, linkedSetOf(), frontPos, frontPos)
-        val platformBlocks = triple.first
-        return if(platformBlocks.count() > 25) {
-            LiftActionResult.INVALID_PLATFORM
-        }else{
-            if(!simulation) {
-                val platform = PlatformEntity(triple.second, triple.third, world)
-                val spawnPos = triple.third
-                platform.updatePosition(spawnPos.x + 0.5, spawnPos.y + 0.0, spawnPos.z + 0.5)
-                platform.speed = lift?.platformSpeed ?: 0.0
-                platform.initialElevation = spawnPos.y + 0.0
-                platform.finalElevation = destination.pos.y + 0.0
-                world.spawnEntity(platform)
-            }
-            LiftActionResult.SUCCESSFUL
-        }
-    }
-
-    private fun floodfillPlatformBlocks(world: World, state: BlockState, pos: BlockPos, set: LinkedHashSet<BlockPos>, corner1: BlockPos, corner2: BlockPos): Triple<LinkedHashSet<BlockPos>, BlockPos, BlockPos> {
-        var newCorner1 = corner1
-        var newCorner2 = corner2
-        if(!set.contains(pos) && world.getBlockState(pos) == state && set.count() <= 25) {
-            set.add(pos)
-            if(pos.x > newCorner1.x || pos.z > newCorner1.z) {
-                newCorner1 = pos
-            }
-            if(pos.x < newCorner2.x || pos.z < newCorner2.z) {
-                newCorner2 = pos
-            }
-            Direction.values().iterator().forEach {
-                if(it.axis != Direction.Axis.Y) {
-                    val triple = floodfillPlatformBlocks(world, state, pos.add(it.vector), set, newCorner1, newCorner2)
-                    if(triple.second.x > newCorner1.x || triple.second.z > newCorner1.z) {
-                        newCorner1 = triple.second
-                    }
-                    if(triple.third.x < newCorner2.x || triple.third.z < newCorner2.z) {
-                        newCorner2 = triple.third
-                    }
-                }
-            }
-        }
-        return Triple(set, newCorner1, newCorner2)
-    }
-
     override fun fromTag(state: BlockState?, tag: CompoundTag) {
         super.fromTag(state, tag)
         liftName = if(tag.contains("liftName")) tag.getString("liftName") else null
-    }
-
-    override fun fromClientTag(tag: CompoundTag) {
-        liftShaft = linkedSetOf()
-        val shaftLongArray = tag.getLongArray("shaft")
-        shaftLongArray.forEach { long ->
-            val pos = BlockPos.fromLong(long)
-            val entity = world?.getBlockEntity(pos) as? LiftBlockEntity
-            entity?.let { liftShaft?.add(it) }
-        }
-        fromTag(lift?.defaultState, tag)
     }
 
     override fun toTag(tag: CompoundTag): CompoundTag {
@@ -176,9 +96,4 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEn
         return super.toTag(tag)
     }
 
-    override fun toClientTag(tag: CompoundTag): CompoundTag {
-        val shaftLongArray = liftShaft?.map{it.pos.asLong()}?.toLongArray() ?: longArrayOf()
-        tag.putLongArray("shaft", shaftLongArray)
-        return toTag(tag)
-    }
 }

@@ -54,8 +54,8 @@ object PacketCompendium {
             val destination = buf.readBlockPos()
             server.execute {
                 val destinyEntity = (player.world.getBlockEntity(destination) as? LiftBlockEntity) ?: return@execute
-                if(destinyEntity.ready && destinyEntity.isShaftValid && !destinyEntity.isPlatformHere) {
-                    destinyEntity.liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(player.world as ServerWorld, destinyEntity, false)
+                if(destinyEntity.ready && !destinyEntity.isPlatformHere) {
+                    destinyEntity.liftShaft?.sendPlatformTo(player.world, destinyEntity, false)
                 }
             }
         }

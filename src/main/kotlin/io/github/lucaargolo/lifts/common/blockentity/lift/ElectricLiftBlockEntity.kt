@@ -23,20 +23,18 @@ class ElectricLiftBlockEntity(private val energyCapacity: Double, private val en
 
     override fun setStored(energyStored: Double) {
         this.energyStored = energyStored
+        markDirty()
     }
 
-    override fun sendPlatformTo(world: World, destination: LiftBlockEntity, simulation: Boolean): LiftActionResult {
-        val distance = MathHelper.abs(destination.pos.y - this.pos.y)
+    override fun preSendRequirements(distance: Int): LiftActionResult {
         val cost = ENERGY_PER_BLOCK * distance
-        if(energyStored - cost >= 0) {
-            val result = super.sendPlatformTo(world, destination, simulation)
-            if(result.isAccepted() && !simulation) {
-                energyStored -= cost
-                sync()
-            }
-            return result
-        }
-        return LiftActionResult.NO_ENERGY
+        return if(energyStored - cost >= 0) LiftActionResult.SUCCESSFUL else LiftActionResult.NO_ENERGY
+    }
+
+    override fun postSendRequirements(distance: Int) {
+        val cost = ENERGY_PER_BLOCK * distance
+        energyStored -= cost
+        markDirty()
     }
 
     override fun fromTag(state: BlockState?, tag: CompoundTag) {

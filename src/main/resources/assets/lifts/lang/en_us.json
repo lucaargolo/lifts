@@ -15,7 +15,7 @@
   "screen.tooltip.already_here": "The lift is already at this floor!",
   "screen.tooltip.invalid_shaft": "The lift shaft is invalid!",
   "screen.tooltip.invalid_platform": "The created platform is invalid!",
-  "screen.tooltip.no_platform": "The lift can't create a platform entity!",
+  "screen.tooltip.no_platform": "No platform has been found!",
   "screen.tooltip.no_range": "The lift can't reach this floor!",
   "screen.tooltip.no_energy": "The lift doesn't have enough energy!",
   "screen.tooltip.no_fuel": "The lift doesn't have enough fuel!",

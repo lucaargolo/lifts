@@ -15,7 +15,9 @@ import net.minecraft.util.ActionResult
 import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Direction
 import net.minecraft.world.World
+import net.minecraft.world.WorldAccess
 
 abstract class Lift(settings: Settings, val platformSpeed: Double, val platformRange: Int): BlockWithEntity(settings) {
 
@@ -36,13 +38,22 @@ abstract class Lift(settings: Settings, val platformSpeed: Double, val platformR
         return defaultState.with(Properties.HORIZONTAL_FACING, ctx.playerFacing.opposite)
     }
 
+    @Suppress("DEPRECATION")
+    override fun neighborUpdate(state: BlockState?, world: World, pos: BlockPos, block: Block?, fromPos: BlockPos?, notify: Boolean) {
+        (world.getBlockEntity(pos) as? LiftBlockEntity)?.let{
+            it.resetPlatformCache()
+            it.liftShaft?.neighborUpdate(it)
+        }
+        super.neighborUpdate(state, world, pos, block, fromPos, notify)
+    }
+
     override fun getRenderType(state: BlockState?) = BlockRenderType.MODEL
 
     override fun hasComparatorOutput(state: BlockState?) = true
 
     override fun getComparatorOutput(state: BlockState?, world: World, pos: BlockPos?): Int {
         (world.getBlockEntity(pos) as? LiftBlockEntity)?.let{
-            if(it.isPlatformHere && it.isShaftValid) return 15
+            if(it.isPlatformHere) return 15
         }
         return 0
     }
