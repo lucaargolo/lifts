@@ -16,9 +16,22 @@ import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
+import net.minecraft.world.World
 
-abstract class LiftBlockEntity(type: BlockEntityType<*>, val lift: Lift?): SynchronizeableBlockEntity(type), Tickable {
+abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEntity(type), Tickable {
 
+    enum class LiftActionResult {
+        INVALID_PLATFORM,
+        NO_PLATFORM,
+        NO_RANGE,
+        NO_ENERGY,
+        NO_FUEL,
+        SUCCESSFUL;
+
+        fun isAccepted() = this == SUCCESSFUL
+    }
+
+    var lift: Lift? = null
     var liftName: String? = null
     var liftShaft: LinkedHashSet<LiftBlockEntity>? = null
 
@@ -57,6 +70,9 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>, val lift: Lift?): Synch
     }
 
     override fun tick() {
+        if(lift == null) {
+            lift = world?.getBlockState(pos)?.block as? Lift
+        }
         val world: ServerWorld = world as? ServerWorld ?: return
         if(liftShaft == null) {
             val set = LiftHelper.getOrCreateLiftShaft(pos)
@@ -78,38 +94,42 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>, val lift: Lift?): Synch
         }
         if(world.isReceivingRedstonePower(pos)) {
             if(ready && isShaftValid && !isPlatformHere) {
-                ready = liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(world, this) ?: false
+                val actionResult = liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(world, this, false)
+                ready = actionResult?.isAccepted() ?: false
             }
         }else{
             ready = true
         }
     }
 
-    open fun sendPlatformTo(world: ServerWorld, destination: LiftBlockEntity): Boolean {
+    open fun sendPlatformTo(world: World, destination: LiftBlockEntity, simulation: Boolean): LiftActionResult {
         val state = world.getBlockState(frontPos)
         if(!state.isFullCube(world, frontPos)) {
-            return false
+            return LiftActionResult.INVALID_PLATFORM
         }
         val distance = MathHelper.abs(destination.pos.y - this.pos.y)
         if(distance > lift?.platformRange ?: 0) {
-            return false
+            return LiftActionResult.NO_RANGE
         }
         val triple = floodfillPlatformBlocks(world, state, frontPos, linkedSetOf(), frontPos, frontPos)
         val platformBlocks = triple.first
         return if(platformBlocks.count() > 25) {
-            false
+            LiftActionResult.INVALID_PLATFORM
         }else{
-            val platform = PlatformEntity(triple.second, triple.third, world)
-            val spawnPos = triple.third
-            platform.updatePosition(spawnPos.x+0.5, spawnPos.y+0.0, spawnPos.z+0.5)
-            platform.speed = lift?.platformSpeed ?: 0.0
-            platform.initialElevation = spawnPos.y+0.0
-            platform.finalElevation = destination.pos.y+0.0
-            world.spawnEntity(platform)
+            if(!simulation) {
+                val platform = PlatformEntity(triple.second, triple.third, world)
+                val spawnPos = triple.third
+                platform.updatePosition(spawnPos.x + 0.5, spawnPos.y + 0.0, spawnPos.z + 0.5)
+                platform.speed = lift?.platformSpeed ?: 0.0
+                platform.initialElevation = spawnPos.y + 0.0
+                platform.finalElevation = destination.pos.y + 0.0
+                world.spawnEntity(platform)
+            }
+            LiftActionResult.SUCCESSFUL
         }
     }
 
-    private fun floodfillPlatformBlocks(world: ServerWorld, state: BlockState, pos: BlockPos, set: LinkedHashSet<BlockPos>, corner1: BlockPos, corner2: BlockPos): Triple<LinkedHashSet<BlockPos>, BlockPos, BlockPos> {
+    private fun floodfillPlatformBlocks(world: World, state: BlockState, pos: BlockPos, set: LinkedHashSet<BlockPos>, corner1: BlockPos, corner2: BlockPos): Triple<LinkedHashSet<BlockPos>, BlockPos, BlockPos> {
         var newCorner1 = corner1
         var newCorner2 = corner2
         if(!set.contains(pos) && world.getBlockState(pos) == state && set.count() <= 25) {

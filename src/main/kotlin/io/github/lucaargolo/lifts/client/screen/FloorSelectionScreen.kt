@@ -2,6 +2,7 @@ package io.github.lucaargolo.lifts.client.screen
 
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
 import io.github.lucaargolo.lifts.network.PacketCompendium
+import io.github.lucaargolo.lifts.utils.LateTooltipHolder
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
 import net.minecraft.client.gui.DrawableHelper
@@ -9,16 +10,17 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.LiteralText
+import net.minecraft.text.Text
+import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
-import kotlin.math.max
-import kotlin.math.min
 
-class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText("Lift")) {
+class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(null) {
 
     private val scrollTexture = Identifier("textures/gui/container/villager2.png")
     private val buttonLiftReference = linkedMapOf<LiftBlockEntity, ButtonWidget>()
     private val heightBtnReference = linkedMapOf<ButtonWidget, Int>()
+    private val tooltipBtnReference = linkedMapOf<ButtonWidget, Text>()
 
     private var scrollableOffset = 0.0
     private var scrollable = false
@@ -34,11 +36,13 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText
         scrollable = false
 
         this.blockEntity.liftShaft?.sortedByDescending { it.pos }?.forEachIndexed { index, lift ->
-            val btn = ButtonWidget(10, 10+(index*20), if(scrollable) 100 else 108, 20, LiteralText(getFloorName(index, lift))) {
+            val btn = ButtonWidget(10, 10+(index*20), if(scrollable) 100 else 108, 20, getFloorName(index, lift), {
                 val buf = PacketByteBufs.create()
                 buf.writeBlockPos(lift.pos)
                 ClientPlayNetworking.send(PacketCompendium.SEND_PLATFORM_ENTITY, buf)
-            }
+            }, { button, _, _, _ ->
+                tooltipBtnReference[button]?.let { LateTooltipHolder.scheduleLateTooltip(it, LateTooltipHolder.TooltipMode.RED) }
+            })
             this.addButton(btn)
             if(btn.y + btn.height > 118) {
                 if(!scrollable) {
@@ -96,8 +100,23 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText
         }
         var index = 0
         buttonLiftReference.forEach { (lift, btn) ->
-            btn.active = !lift.isPlatformHere
-            btn.message = LiteralText(getFloorName(index++, lift))
+            if(lift.isPlatformHere) {
+                btn.active = false
+                tooltipBtnReference[btn] = TranslatableText("screen.tooltip.already_here")
+            }else if(!lift.isShaftValid) {
+                btn.active = false
+                tooltipBtnReference[btn] = TranslatableText("screen.tooltip.invalid_shaft")
+            }else{
+                val actionResult = client?.world?.let { world -> blockEntity.liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(world, lift, true) }
+                if(actionResult?.isAccepted() == false) {
+                    btn.active = false
+                    tooltipBtnReference[btn] = TranslatableText("screen.tooltip.${actionResult.name.toLowerCase()}")
+                }else{
+                    btn.active = true
+                    tooltipBtnReference.remove(btn)
+                }
+            }
+            btn.message = getFloorName(index++, lift)
         }
     }
 
@@ -107,7 +126,7 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText
         }
     }
 
-    private fun getFloorName(index: Int, lift: LiftBlockEntity): String {
+    private fun getFloorName(index: Int, lift: LiftBlockEntity): Text{
         val floor = this.blockEntity.liftShaft!!.size - index
         val suffix = when(floor) {
             1 -> "st"
@@ -115,7 +134,7 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText
             3 -> "rd"
             else -> "th"
         }
-        return lift.liftName ?: "$floor$suffix Floor"
+        return lift.liftName?.let { LiteralText(it) } ?: LiteralText("$floor").append(TranslatableText("screen.number.$suffix")).append(" ").append(TranslatableText("screen.common.floor"))
     }
 
 

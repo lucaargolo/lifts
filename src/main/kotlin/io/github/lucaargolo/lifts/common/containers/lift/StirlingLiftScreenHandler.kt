@@ -2,33 +2,49 @@ package io.github.lucaargolo.lifts.common.containers.lift
 
 import io.github.lucaargolo.lifts.common.blockentity.lift.StirlingLiftBlockEntity
 import io.github.lucaargolo.lifts.common.containers.ScreenHandlerCompendium
-import net.minecraft.block.entity.AbstractFurnaceBlockEntity
+import net.fabricmc.fabric.api.registry.FuelRegistry
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.item.ItemStack
 import net.minecraft.screen.ScreenHandler
-import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.screen.slot.Slot
 
-class StirlingLiftScreenHandler(syncId: Int, playerInventory: PlayerInventory, val entity: StirlingLiftBlockEntity?, private val context: ScreenHandlerContext): ScreenHandler(ScreenHandlerCompendium.STIRLING_LIFT_TYPE, syncId)  {
+class StirlingLiftScreenHandler(syncId: Int, playerInventory: PlayerInventory, val entity: StirlingLiftBlockEntity): ScreenHandler(ScreenHandlerCompendium.STIRLING_LIFT_TYPE, syncId)  {
+
+    private val propertyDelegate = entity.propertyDelegate
+
+    var burningTime
+        get() = propertyDelegate.get(0)
+        set(value) = propertyDelegate.set(0, value)
+
+    var burningTicks
+        get() = propertyDelegate.get(1)
+        set(value) = propertyDelegate.set(1, value)
+
+    var storedTicks
+        get() = propertyDelegate.get(2)
+        set(value) = propertyDelegate.set(2, value)
 
     init {
         checkSize(entity, 1)
-        entity?.onOpen(playerInventory.player)
+        checkDataCount(propertyDelegate, 3)
+        entity.onOpen(playerInventory.player)
 
-        addSlot(object: Slot(entity, 0, 8+18*4, 18) {
-            override fun canInsert(stack: ItemStack) = AbstractFurnaceBlockEntity.canUseAsFuel(stack)
+        addSlot(object: Slot(entity, 0, 26, 53) {
+            override fun canInsert(stack: ItemStack) = FuelRegistry.INSTANCE.get(stack.item) > 0
         })
 
         (0..2).forEach { n ->
             (0..8).forEach { m ->
-                addSlot(Slot(playerInventory, m + n * 9 + 9, 8 + m * 18, 49 + n*18))
+                addSlot(Slot(playerInventory, m + n * 9 + 9, 8 + m * 18, 84 + n*18))
             }
         }
 
         (0..8).forEach { n ->
-            addSlot(Slot(playerInventory, n, 8 + n * 18, 107))
+            addSlot(Slot(playerInventory, n, 8 + n * 18, 142))
         }
+
+        addProperties(propertyDelegate)
     }
 
     override fun transferSlot(player: PlayerEntity?, invSlot: Int): ItemStack? {
@@ -53,6 +69,6 @@ class StirlingLiftScreenHandler(syncId: Int, playerInventory: PlayerInventory, v
         return itemStack
     }
 
-    override fun canUse(player: PlayerEntity) = entity?.canPlayerUse(player) ?: false
+    override fun canUse(player: PlayerEntity) = entity.canPlayerUse(player)
 
 }

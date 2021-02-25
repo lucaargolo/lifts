@@ -9,8 +9,9 @@ import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.TextFieldWidget
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.LiteralText
+import net.minecraft.text.TranslatableText
 
-class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText("Lift")) {
+class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(null) {
 
     private var nameField: TextFieldWidget? = null
     private var setButton: ButtonWidget? = null
@@ -22,7 +23,7 @@ class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText("Li
         nameField?.setMaxLength(16)
         nameField?.setEditableColor(16777215)
         this.addChild(nameField)
-        setButton = ButtonWidget((width/2)-61, (height/2)+16, 122, 20, LiteralText("Set name")) {
+        setButton = ButtonWidget((width/2)-61, (height/2)+16, 122, 20, TranslatableText("screen.common.set_name")) {
             val passedData = PacketByteBufs.create()
             passedData.writeBlockPos(blockEntity.pos)
             passedData.writeString(nameField?.text)
@@ -42,7 +43,7 @@ class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText("Li
     override fun render(matrices: MatrixStack?, mouseX: Int, mouseY: Int, delta: Float) {
         this.renderBackground(matrices)
         super.render(matrices, mouseX, mouseY, delta)
-        val text = LiteralText("Please write the desired name: ")
+        val text = TranslatableText("screen.message.write_name").append(": ")
         textRenderer.draw(matrices, text, (width/2f)-(textRenderer.getWidth(text)/2f), (height/2f)-20, 0xFFFFFF)
         nameField?.render(matrices, mouseX, mouseY, delta)
     }
@@ -50,9 +51,9 @@ class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(LiteralText("Li
     override fun tick() {
         nameField?.text?.isEmpty()?.let {
             if(it) {
-                setButton?.message = LiteralText("Reset name")
+                setButton?.message = TranslatableText("screen.common.reset_name")
             }else{
-                setButton?.message = LiteralText("Set name")
+                setButton?.message = TranslatableText("screen.common.set_name")
             }
         }
     }

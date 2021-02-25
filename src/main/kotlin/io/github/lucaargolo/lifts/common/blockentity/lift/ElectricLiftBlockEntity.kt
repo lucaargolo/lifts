@@ -1,16 +1,15 @@
 package io.github.lucaargolo.lifts.common.blockentity.lift
 
-import io.github.lucaargolo.lifts.common.block.lift.Lift
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundTag
-import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.math.MathHelper
+import net.minecraft.world.World
 import team.reborn.energy.EnergySide
 import team.reborn.energy.EnergyStorage
 import team.reborn.energy.EnergyTier
 
-class ElectricLiftBlockEntity(lift: Lift?, private val energyCapacity: Double, private val energyTier: EnergyTier): LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LIFT_TYPE, lift), EnergyStorage {
+class ElectricLiftBlockEntity(private val energyCapacity: Double, private val energyTier: EnergyTier): LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LIFT_TYPE), EnergyStorage {
 
     private var energyStored = 0.0
 
@@ -26,18 +25,18 @@ class ElectricLiftBlockEntity(lift: Lift?, private val energyCapacity: Double, p
         this.energyStored = energyStored
     }
 
-    override fun sendPlatformTo(world: ServerWorld, destination: LiftBlockEntity): Boolean {
+    override fun sendPlatformTo(world: World, destination: LiftBlockEntity, simulation: Boolean): LiftActionResult {
         val distance = MathHelper.abs(destination.pos.y - this.pos.y)
         val cost = ENERGY_PER_BLOCK * distance
         if(energyStored - cost >= 0) {
-            val result = super.sendPlatformTo(world, destination)
-            if(result) {
+            val result = super.sendPlatformTo(world, destination, simulation)
+            if(result.isAccepted() && !simulation) {
                 energyStored -= cost
                 sync()
             }
             return result
         }
-        return false
+        return LiftActionResult.NO_ENERGY
     }
 
     override fun fromTag(state: BlockState?, tag: CompoundTag) {

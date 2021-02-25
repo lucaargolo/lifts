@@ -38,9 +38,10 @@ class ScreenBlock(settings: Settings): BlockWithEntity(settings) {
         val facing = state[Properties.HORIZONTAL_FACING]
         (world.getBlockEntity(pos) as? ScreenBlockEntity)?.let{ screenBlockEntity ->
             val mousePos = ScreenBlockHandler.getMousePosition(hit, facing, pos)
-            if(screenBlockEntity.clickDelay == 0) {
+            if(screenBlockEntity.clickDelay == 0 && (mousePos.first != 0.0 || mousePos.second != 0.0)) {
                 screenBlockEntity.clickDelay = 5
                 screenBlockEntity.screen?.mouseClicked(mousePos.first, mousePos.second, 0)
+                return ActionResult.SUCCESS
             }
         }
         return super.onUse(state, world, pos, player, hand, hit)

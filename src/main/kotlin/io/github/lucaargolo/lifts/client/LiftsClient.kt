@@ -5,6 +5,7 @@ import io.github.lucaargolo.lifts.client.render.blockentity.BlockEntityRendererC
 import io.github.lucaargolo.lifts.client.render.entity.EntityRendererCompendium
 import io.github.lucaargolo.lifts.common.containers.ScreenHandlerCompendium
 import io.github.lucaargolo.lifts.network.PacketCompendium
+import io.github.lucaargolo.lifts.utils.LateTooltipHolder
 import net.fabricmc.api.ClientModInitializer
 
 class LiftsClient: ClientModInitializer {
@@ -14,5 +15,6 @@ class LiftsClient: ClientModInitializer {
         BlockEntityRendererCompendium.initialize()
         EntityRendererCompendium.initialize()
         BakedModelCompendium.initialize()
+        LateTooltipHolder.onInitializeClient()
     }
 }

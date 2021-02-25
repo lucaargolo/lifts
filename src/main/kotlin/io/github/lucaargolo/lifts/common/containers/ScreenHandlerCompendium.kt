@@ -8,7 +8,6 @@ import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry
 import net.fabricmc.fabric.impl.screenhandler.ExtendedScreenHandlerType
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.screen.ScreenHandler
-import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.util.registry.Registry
 
@@ -18,8 +17,8 @@ object ScreenHandlerCompendium: RegistryCompendium<ScreenHandlerType<*>>(Registr
         val pos = packetByteBuf.readBlockPos()
         val player = playerInventory.player
         val world = player.world
-        val be = world.getBlockEntity(pos) as? StirlingLiftBlockEntity
-        StirlingLiftScreenHandler(i, playerInventory, be, ScreenHandlerContext.create(world, pos))
+        val be = world.getBlockEntity(pos) as StirlingLiftBlockEntity
+        StirlingLiftScreenHandler(i, playerInventory, be)
     })
 
     @Suppress("UNCHECKED_CAST")

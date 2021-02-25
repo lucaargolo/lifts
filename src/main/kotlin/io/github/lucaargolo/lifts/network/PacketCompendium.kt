@@ -15,7 +15,7 @@ object PacketCompendium {
     val RENAME_LIFT_ENTITY = ModIdentifier("rename_lift_entity")
 
     fun onInitializeClient() {
-        ClientPlayNetworking.registerGlobalReceiver(SPAWN_PLATFORM_ENTITY) {client, handler, buf, sender ->
+        ClientPlayNetworking.registerGlobalReceiver(SPAWN_PLATFORM_ENTITY) {client, handler, buf, _ ->
             val id = buf.readVarInt()
             val uuid = buf.readUuid()
             val x = buf.readDouble()
@@ -50,17 +50,17 @@ object PacketCompendium {
     }
 
     fun onInitialize() {
-        ServerPlayNetworking.registerGlobalReceiver(SEND_PLATFORM_ENTITY) {server, player, handler, buf, sender ->
+        ServerPlayNetworking.registerGlobalReceiver(SEND_PLATFORM_ENTITY) {server, player, _, buf, _ ->
             val destination = buf.readBlockPos()
             server.execute {
                 val destinyEntity = (player.world.getBlockEntity(destination) as? LiftBlockEntity) ?: return@execute
                 if(destinyEntity.ready && destinyEntity.isShaftValid && !destinyEntity.isPlatformHere) {
-                    destinyEntity.liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(player.world as ServerWorld, destinyEntity)
+                    destinyEntity.liftShaft?.firstOrNull{ it.isPlatformHere }?.sendPlatformTo(player.world as ServerWorld, destinyEntity, false)
                 }
             }
         }
 
-        ServerPlayNetworking.registerGlobalReceiver(RENAME_LIFT_ENTITY) { server, player, handler, buf, sender ->
+        ServerPlayNetworking.registerGlobalReceiver(RENAME_LIFT_ENTITY) { server, player, _, buf, _ ->
             val entityPos = buf.readBlockPos()
             val newEntityName = buf.readString(32767)
             server.execute {
