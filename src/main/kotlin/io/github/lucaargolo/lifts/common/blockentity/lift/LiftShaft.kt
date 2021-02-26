@@ -117,12 +117,6 @@ class LiftShaft private constructor(val key: RegistryKey<World>, val x: Int, val
         return LiftActionResult.SUCCESSFUL
     }
 
-    fun markEntityDirty(lift: LiftBlockEntity) {
-        if(platformedLifts.contains(lift)) {
-            simulationCache.clear()
-        }
-    }
-
     private fun cacheAndReturn(result: LiftActionResult, destination: LiftBlockEntity, simulation: Boolean): LiftActionResult {
         if(simulation) {
             simulationCache[destination] = result

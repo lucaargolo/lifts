@@ -16,6 +16,8 @@ import net.minecraft.util.math.Direction
 
 abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEntity(type), Tickable {
 
+    protected var prevReachableLifts = 0
+
     var lift: Lift? = null
     var liftName: String? = null
     var liftShaft: LiftShaft? = null
@@ -43,14 +45,20 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEn
         if(world?.isClient == false) sync()
     }
 
-    override fun markDirty() {
-        liftShaft?.markEntityDirty(this)
-    }
-
     override fun markRemoved() {
         liftShaft?.removeLift(this)
     }
 
+    override fun markDirty() {
+        super.markDirty()
+        val reachableLifts = getReachableLifts()
+        if(reachableLifts != prevReachableLifts) {
+            liftShaft?.updateLift(this)
+        }
+        prevReachableLifts = reachableLifts
+    }
+
+    abstract fun getReachableLifts(): Int
     abstract fun preSendRequirements(distance: Int): LiftActionResult
     abstract fun postSendRequirements(distance: Int)
 

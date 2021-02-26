@@ -16,7 +16,7 @@ import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
 
-class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(null) {
+class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(TranslatableText("screen.title.floor_selection")) {
 
     private val scrollTexture = Identifier("textures/gui/container/villager2.png")
     private val buttonLiftReference = linkedMapOf<LiftBlockEntity, ButtonWidget>()

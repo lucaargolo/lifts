@@ -11,6 +11,7 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.screen.PropertyDelegate
 import net.minecraft.util.collection.DefaultedList
 import net.minecraft.util.math.Direction
+import net.minecraft.util.math.MathHelper
 
 class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LIFT_TYPE), SidedInventory {
 
@@ -54,6 +55,20 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
     override fun canInsert(slot: Int, stack: ItemStack, dir: Direction?) = FuelRegistry.INSTANCE.get(stack.item) > 0
     override fun canExtract(slot: Int, stack: ItemStack, dir: Direction?) = false
 
+    override fun getReachableLifts(): Int {
+        var x = 0
+        liftShaft?.lifts?.forEach {
+            val distance = MathHelper.abs(it.pos.y - pos.y)
+            lift?.platformRange?.let { range ->
+                if((0..range).contains(distance) && storedTicks >= distance * TICKS_PER_BLOCK) {
+                    x++
+                }
+            }
+        }
+        return x
+    }
+
+
     override fun tick() {
         if(burningTicks == 0) {
             if(storedTicks < MAX_FUEL_TICKS) {
@@ -62,6 +77,7 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
                     inventory[0].decrement(1)
                     burningTicks += burningTime
                 }
+                markDirty()
             }
         }else{
             if(storedTicks < MAX_FUEL_TICKS) {

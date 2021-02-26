@@ -5,7 +5,6 @@ import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.math.MathHelper
-import net.minecraft.world.World
 import team.reborn.energy.EnergySide
 import team.reborn.energy.EnergyStorage
 import team.reborn.energy.EnergyTier
@@ -28,6 +27,19 @@ class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LI
     override fun setStored(energyStored: Double) {
         this.energyStored = energyStored
         markDirty()
+    }
+
+    override fun getReachableLifts(): Int {
+        var x = 0
+        liftShaft?.lifts?.forEach {
+            val distance = MathHelper.abs(it.pos.y - pos.y)
+            lift?.platformRange?.let { range ->
+                if((0..range).contains(distance) && energyStored >= distance*ENERGY_PER_BLOCK) {
+                    x++
+                }
+            }
+        }
+        return x
     }
 
     override fun tick() {

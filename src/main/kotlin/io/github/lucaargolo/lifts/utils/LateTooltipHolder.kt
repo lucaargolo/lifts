@@ -39,13 +39,11 @@ object LateTooltipHolder: DrawableHelper() {
 
     private fun renderOrderedTooltip(matrices: MatrixStack, lines: List<OrderedText>, tooltipMode: TooltipMode) {
         val client = MinecraftClient.getInstance()
-        val window = client.window
-        val textRenderer = client.textRenderer
         if (lines.isNotEmpty()) {
-            val maxLength = lines.map { textRenderer.getWidth(it) }.maxOrNull() ?: 0
+            val maxLength = lines.map { client.textRenderer.getWidth(it) }.maxOrNull() ?: 0
 
-            val x = window.width/4 - 24
-            var y = window.height/4 - 24
+            val x = client.window.width/(client.options.guiScale*2) - 24
+            var y = client.window.height/(client.options.guiScale*2) - 24
 
             var n = 8
             if (lines.size > 1) {
@@ -81,7 +79,7 @@ object LateTooltipHolder: DrawableHelper() {
             RenderSystem.enableTexture()
 
             lines.forEachIndexed { index, orderedText ->
-                textRenderer.draw(matrices, orderedText, x.toFloat(), y.toFloat(), -1)
+                client.textRenderer.draw(matrices, orderedText, x.toFloat(), y.toFloat(), -1)
                 if (index == 0) {
                     y += 2
                 }
