@@ -1,6 +1,24 @@
 {
-  "screen.title.stirling_lift": "Stirling Lift",
+  "item.lifts.linking_tool": "Linking Tool",
 
+  "block.lifts.stirling_lift": "Stirling Lift",
+  "block.lifts.electric_lift_mk1": "Electric Lift MK1",
+  "block.lifts.electric_lift_mk2": "Electric Lift MK2",
+  "block.lifts.electric_lift_mk3": "Electric Lift MK3",
+  "block.lifts.electric_lift_mk4": "Electric Lift MK4",
+  "block.lifts.electric_lift_mk5": "Electric Lift MK5",
+
+  "tooltip.sneak_for_more": "Press <KEY> to see more info.",
+  "tooltip.powered_by_coal": "This lift is powered by burnable fuels.",
+  "tooltip.powered_by_energy": "This lift is powered by energy.",
+
+  "tooltip.common.platform_range": "Range",
+  "tooltip.common.platform_speed": "Speed Multiplier",
+  "tooltip.common.energy_input": "Input",
+  "tooltip.common.energy_capacity": "Capacity",
+
+  "screen.title.stirling_lift": "Stirling Lift",
+  "screen.title.electric_lift": "Electric Lift",
 
   "screen.common.write_name": "Please write the desired name",
   "screen.common.set_name": "Set name",
@@ -10,6 +28,7 @@
   "screen.common.floor": "Floor",
   "screen.common.burning_ticks": "Burning Ticks",
   "screen.common.stored_ticks": "Stored Ticks",
+  "screen.common.stored_energy": "Stored Energy",
   "screen.common.rename_lift": "Rename Lift",
 
   "screen.tooltip.already_here": "The lift is already at this floor!",

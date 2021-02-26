@@ -1,5 +1,6 @@
 package io.github.lucaargolo.lifts.common.blockentity.lift
 
+import io.github.lucaargolo.lifts.common.block.lift.ElectricLift
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import net.minecraft.block.BlockState
 import net.minecraft.nbt.CompoundTag
@@ -9,8 +10,11 @@ import team.reborn.energy.EnergySide
 import team.reborn.energy.EnergyStorage
 import team.reborn.energy.EnergyTier
 
-class ElectricLiftBlockEntity(private val energyCapacity: Double, private val energyTier: EnergyTier): LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LIFT_TYPE), EnergyStorage {
+class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LIFT_TYPE), EnergyStorage {
 
+    private var initializedEnergy = false
+    private var energyTier = EnergyTier.INSANE
+    private var energyCapacity = 0.0
     private var energyStored = 0.0
 
     override fun getMaxStoredPower() = this.energyCapacity
@@ -24,6 +28,17 @@ class ElectricLiftBlockEntity(private val energyCapacity: Double, private val en
     override fun setStored(energyStored: Double) {
         this.energyStored = energyStored
         markDirty()
+    }
+
+    override fun tick() {
+        super.tick()
+        if(!initializedEnergy) {
+            (lift as? ElectricLift)?.let {
+                energyTier = it.energyTier
+                energyCapacity = it.energyCapacity
+                initializedEnergy = true
+            }
+        }
     }
 
     override fun preSendRequirements(distance: Int): LiftActionResult {

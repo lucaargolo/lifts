@@ -9,8 +9,12 @@ import net.minecraft.client.gui.screen.Screen
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
+import team.reborn.energy.EnergyHolder
+import team.reborn.energy.EnergySide
+import team.reborn.energy.EnergyStorage
+import team.reborn.energy.EnergyTier
 
-class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN_TYPE), Linkable, Tickable {
+class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN_TYPE), Linkable, Tickable, EnergyStorage {
 
     enum class State {
         NO_ENERGY,
@@ -18,18 +22,21 @@ class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN
         LINKED
     }
 
-    var state = State.UNLINKED
+    var state = State.NO_ENERGY
         set(value) {
             screen = null
             field = value
+            if(world?.isClient == false) {
+                sync()
+            }
         }
 
     var linkedPos: BlockPos? = null
+    var storedEnergy = 0.0
 
     override fun link(blockPos: BlockPos): Boolean {
         if(world?.getBlockEntity(blockPos) is LiftBlockEntity) {
             linkedPos = blockPos
-            state = State.LINKED
             return true
         }
         return false
@@ -44,9 +51,21 @@ class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN
             clickDelay--
         }
         if(tickDelay > 20) {
-            if(state == State.LINKED && linkedPos?.let { world?.getBlockEntity(it) } !is LiftBlockEntity) {
-                linkedPos = null
-                state = State.UNLINKED
+            when(state) {
+                State.NO_ENERGY -> if(storedEnergy >= 100.0) state = State.LINKED
+                State.UNLINKED, State.LINKED -> {
+                    if(storedEnergy < 100.0) {
+                        state = State.NO_ENERGY
+                    }else{
+                        storedEnergy--
+                    }
+                    if(state == State.UNLINKED && linkedPos != null) {
+                        state = State.LINKED
+                    }else if(state == State.LINKED && linkedPos?.let { world?.getBlockEntity(it) } !is LiftBlockEntity) {
+                        linkedPos = null
+                        state = State.UNLINKED
+                    }
+                }
             }
             tickDelay = 0
         }else{
@@ -56,6 +75,7 @@ class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN
     }
 
     override fun toTag(tag: CompoundTag): CompoundTag {
+        tag.putDouble("storedEnergy", storedEnergy)
         linkedPos?.let { tag.putLong("linkedPos", it.asLong()) }
         tag.putString("state", state.name)
         return super.toTag(tag)
@@ -63,6 +83,7 @@ class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN
 
     override fun fromTag(blockState: BlockState, tag: CompoundTag) {
         super.fromTag(blockState, tag)
+        storedEnergy = tag.getDouble("storedEnergy")
         linkedPos = if(tag.contains("linkedPos")) {
             BlockPos.fromLong(tag.getLong("linkedPos"))
         } else { null }
@@ -72,7 +93,16 @@ class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN
             e.printStackTrace()
             State.NO_ENERGY
         }
-        println(state.name)
+    }
+
+    override fun getMaxStoredPower() = 16000.0
+
+    override fun getTier() = EnergyTier.LOW
+
+    override fun getStored(p0: EnergySide?) = storedEnergy
+
+    override fun setStored(p0: Double) {
+        storedEnergy = p0
     }
 
 }

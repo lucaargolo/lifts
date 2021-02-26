@@ -2,8 +2,6 @@ package io.github.lucaargolo.lifts.common.blockentity.lift
 
 import io.github.lucaargolo.lifts.utils.SynchronizeableBlockEntity
 import io.github.lucaargolo.lifts.common.block.lift.Lift
-import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
-import io.github.lucaargolo.lifts.common.entity.platform.PlatformEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
@@ -15,8 +13,6 @@ import net.minecraft.util.ItemScatterer
 import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
-import net.minecraft.util.math.MathHelper
-import net.minecraft.world.World
 
 abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEntity(type), Tickable {
 
@@ -44,6 +40,7 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEn
 
     fun resetPlatformCache() {
         isPlatformHereCache = null
+        if(world?.isClient == false) sync()
     }
 
     override fun markDirty() {
@@ -62,7 +59,7 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEn
             lift = world?.getBlockState(pos)?.block as? Lift
         }
         if(liftShaft == null) {
-            liftShaft = LiftShaft.getOrCreate(pos)
+            liftShaft = world?.let { LiftShaft.getOrCreate(it, pos) }
             if(liftShaft?.facing != null && facing != liftShaft?.facing)  {
                 (world as? ServerWorld)?.let { serverWorld ->
                     val stacks = Block.getDroppedStacks(cachedState, serverWorld, pos, this)
@@ -84,6 +81,12 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEn
         }else{
             ready = true
         }
+    }
+
+    override fun fromClientTag(tag: CompoundTag) {
+        super.fromClientTag(tag)
+        resetPlatformCache()
+        liftShaft?.updateLift(this)
     }
 
     override fun fromTag(state: BlockState?, tag: CompoundTag) {

@@ -1,6 +1,7 @@
 package io.github.lucaargolo.lifts.client.render.bakedmodel
 
 import com.mojang.datafixers.util.Pair
+import io.github.lucaargolo.lifts.client.render.bakedmodel.screen.ElectricLiftBakedModel
 import io.github.lucaargolo.lifts.client.render.bakedmodel.screen.ScreenBakedModel
 import io.github.lucaargolo.lifts.utils.GenericCompendium
 import io.github.lucaargolo.lifts.utils.ModIdentifier
@@ -19,15 +20,16 @@ import java.util.function.Function
 object BakedModelCompendium: GenericCompendium<BakedModel>() {
 
     val SCREEN_MODEL = register(ModIdentifier("screen"), ScreenBakedModel())
+    val ELECTRIC_LIFT_MODEL = register(ModIdentifier("electric_lift"), ElectricLiftBakedModel())
 
     override fun initialize() {
         ModelLoadingRegistry.INSTANCE.registerVariantProvider {
             ModelVariantProvider { modelIdentifier, _ ->
                 map.forEach { (identifier, model) ->
                     val equals = if(identifier is ModelIdentifier) {
-                        identifier.namespace == modelIdentifier.namespace && identifier.path == modelIdentifier.path && identifier.variant == modelIdentifier.variant
+                        identifier.namespace == modelIdentifier.namespace && modelIdentifier.path.startsWith(identifier.path) && identifier.variant == modelIdentifier.variant
                     } else {
-                        identifier.namespace == modelIdentifier.namespace && identifier.path == modelIdentifier.path
+                        identifier.namespace == modelIdentifier.namespace && modelIdentifier.path.startsWith(identifier.path)
                     }
                     if(equals) {
                         return@ModelVariantProvider (model as? UnbakedModel) ?: object : UnbakedModel {

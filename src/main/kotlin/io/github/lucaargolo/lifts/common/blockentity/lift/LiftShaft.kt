@@ -4,20 +4,19 @@ import io.github.lucaargolo.lifts.common.block.BlockCompendium
 import io.github.lucaargolo.lifts.common.block.lift.Lift
 import io.github.lucaargolo.lifts.common.entity.platform.PlatformEntity
 import net.minecraft.block.BlockState
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3i
+import net.minecraft.util.registry.RegistryKey
 import net.minecraft.world.World
 import java.util.*
 import kotlin.Comparator
 import kotlin.collections.LinkedHashMap
 import kotlin.collections.LinkedHashSet
 
-class LiftShaft private constructor(val x: Int, val z: Int) {
+class LiftShaft private constructor(val key: RegistryKey<World>, val x: Int, val z: Int) {
 
     private val blockEntitySet: SortedSet<LiftBlockEntity> = sortedSetOf(Comparator { a, b -> b.pos.y - a.pos.y})
     private val platformedLifts: LinkedHashSet<LiftBlockEntity> = linkedSetOf()
@@ -33,7 +32,9 @@ class LiftShaft private constructor(val x: Int, val z: Int) {
         return if(blockEntitySet.add(lift)) {
             if(facing == null) facing = lift.cachedState[Properties.HORIZONTAL_FACING]
             if(lift.isPlatformHere) platformedLifts.add(lift)
-            (lift.world as? ServerWorld)?.let{ blockEntitySet.forEach { it.sync() } }
+            blockEntitySet.forEach {
+                if(it.world?.isClient == false) it.sync()
+            }
             size++
             true
         }else{
@@ -44,7 +45,9 @@ class LiftShaft private constructor(val x: Int, val z: Int) {
         simulationCache.clear()
         return if (blockEntitySet.remove(lift)) {
             if(lift.isPlatformHere) platformedLifts.remove(lift)
-            (lift.world as? ServerWorld)?.let{ blockEntitySet.forEach { it.sync() } }
+            blockEntitySet.forEach {
+                if(it.world?.isClient == false) it.sync()
+            }
             size--
             true
         } else {
@@ -52,24 +55,26 @@ class LiftShaft private constructor(val x: Int, val z: Int) {
         }
     }
 
-    fun neighborUpdate(lift: LiftBlockEntity) {
+    fun updateLift(lift: LiftBlockEntity) {
         simulationCache.clear()
         if(lift.isPlatformHere) {
             platformedLifts.add(lift)
         }else{
             platformedLifts.remove(lift)
         }
-        (lift.world as? ServerWorld)?.let{ blockEntitySet.forEach { it.sync() } }
+        blockEntitySet.forEach {
+            if(it.world?.isClient == false) it.sync()
+        }
     }
 
     fun sendPlatformTo(world: World, destination: LiftBlockEntity, simulation: Boolean): LiftActionResult {
         val cachedResult = simulationCache[destination]
-        if(simulation && cachedResult != null) {
-            return cachedResult
-        } else if(platformedLifts.size > 1) {
-            return cacheAndReturn(LiftActionResult.TOO_MANY_PLATFORMS, destination, simulation)
+        if(platformedLifts.size > 1) {
+            return LiftActionResult.TOO_MANY_PLATFORMS
         } else if(platformedLifts.size < 1) {
-            return cacheAndReturn(LiftActionResult.NO_PLATFORM, destination, simulation)
+            return LiftActionResult.NO_PLATFORM
+        }else if(simulation && cachedResult != null) {
+            return cachedResult
         }
 
         val platformedEntity = platformedLifts.first()
@@ -88,12 +93,12 @@ class LiftShaft private constructor(val x: Int, val z: Int) {
         val platformBlocks = triple.first
 
         if(platformBlocks.count() > 25) {
-            cacheAndReturn(LiftActionResult.INVALID_PLATFORM, destination, simulation)
+            return cacheAndReturn(LiftActionResult.INVALID_PLATFORM, destination, simulation)
         }
 
         val preRequirements = platformedEntity.preSendRequirements(distance)
         if(!preRequirements.isAccepted()) {
-            cacheAndReturn(preRequirements, destination, simulation)
+            return cacheAndReturn(preRequirements, destination, simulation)
         }
 
         if(!simulation) {
@@ -152,24 +157,61 @@ class LiftShaft private constructor(val x: Int, val z: Int) {
     }
 
     override fun hashCode(): Int {
-        return x * 13 + z
+        return key.value.toString().hashCode() xor x xor z
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other is LiftShaft) {
-            return (x == other.x && z == other.z)
+            return (key == other.key && x == other.x && z == other.z)
         }
         return false
     }
 
     companion object {
-        private val liftShaftSet: LinkedHashSet<LiftShaft> = linkedSetOf()
+        private val serverLiftShaftSet: LinkedHashSet<LiftShaft> = linkedSetOf()
+        private val clientLiftShaftSet: LinkedHashSet<LiftShaft> = linkedSetOf()
 
-        fun getOrCreate(pos: BlockPos): LiftShaft = liftShaftSet.find { it.x == pos.x && it.z == pos.z } ?: let {
-            val newLiftShaft = LiftShaft(pos.x, pos.z)
-            liftShaftSet.add(newLiftShaft)
+        private fun getEnvironmentLiftSet(world: World): LinkedHashSet<LiftShaft> {
+            return if(world.isClient) {
+                clientLiftShaftSet
+            }else {
+                serverLiftShaftSet
+            }
+        }
+
+        fun getOrCreate(world: World, pos: BlockPos): LiftShaft = getEnvironmentLiftSet(world).find { it.key == world.registryKey && it.x == pos.x && it.z == pos.z } ?: let {
+            val newLiftShaft = LiftShaft(world.registryKey, pos.x, pos.z)
+            getEnvironmentLiftSet(world).add(newLiftShaft)
             newLiftShaft
+        }
+
+        fun tickClient() {
+            val iterator = clientLiftShaftSet.iterator()
+            while(iterator.hasNext()) {
+                val shaft = iterator.next()
+                if(shaft.blockEntitySet.isEmpty()) {
+                    iterator.remove()
+                }
+            }
+        }
+
+        fun tickServer() {
+            val iterator = serverLiftShaftSet.iterator()
+            while(iterator.hasNext()) {
+                val shaft = iterator.next()
+                if(shaft.blockEntitySet.isEmpty()) {
+                    iterator.remove()
+                }
+            }
+        }
+
+        fun clearClient() {
+            clientLiftShaftSet.clear()
+        }
+
+        fun clearServer() {
+            serverLiftShaftSet.clear()
         }
     }
 

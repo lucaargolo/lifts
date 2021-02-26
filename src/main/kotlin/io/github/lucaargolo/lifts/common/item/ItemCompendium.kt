@@ -11,9 +11,6 @@ object ItemCompendium: RegistryCompendium<Item>(Registry.ITEM) {
 
     val LINKING_TOOL = register("linking_tool", LinkingTool(creativeGroupSettings().maxCount(1)))
 
-    val RAW_LIFTIUM_INGOT = register("raw_liftium_ingot", LinkingTool(creativeGroupSettings()))
-    val LIFTIUM_INGOT = register("liftium_ingot", LinkingTool(creativeGroupSettings()))
-
     override fun initialize() {
         BlockCompendium.registerBlockItems(map)
         super.initialize()

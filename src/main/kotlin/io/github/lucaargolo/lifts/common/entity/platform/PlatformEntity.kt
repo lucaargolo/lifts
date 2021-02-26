@@ -1,5 +1,6 @@
 package io.github.lucaargolo.lifts.common.entity.platform
 
+import io.github.lucaargolo.lifts.common.blockentity.lift.LiftShaft
 import io.github.lucaargolo.lifts.common.entity.EntityCompendium
 import io.github.lucaargolo.lifts.network.PacketCompendium
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
@@ -209,6 +210,7 @@ class PlatformEntity: Entity {
         buf.writeCompoundTag(tag)
 
         buf.writeDouble(finalElevation)
+        buf.writeDouble(speed)
 
         return ServerPlayNetworking.createS2CPacket(PacketCompendium.SPAWN_PLATFORM_ENTITY, buf)
     }

@@ -1,20 +1,26 @@
 package io.github.lucaargolo.lifts.network
 
+import io.github.lucaargolo.lifts.client.screen.ElectricLiftScreen
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
 import io.github.lucaargolo.lifts.common.entity.platform.PlatformEntity
 import io.github.lucaargolo.lifts.utils.ModIdentifier
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
-import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.math.BlockPos
 
 object PacketCompendium {
 
     val SPAWN_PLATFORM_ENTITY = ModIdentifier("spawn_platform_entity")
     val SEND_PLATFORM_ENTITY = ModIdentifier("send_platform_entity")
     val RENAME_LIFT_ENTITY = ModIdentifier("rename_lift_entity")
+    val UPDATE_ELECTRIC_LIFT_SCREEN_HANDLER = ModIdentifier("update_electric_lift_screen_handler")
 
     fun onInitializeClient() {
+        ClientPlayNetworking.registerGlobalReceiver(UPDATE_ELECTRIC_LIFT_SCREEN_HANDLER) { client, handler, buf, _ ->
+            val double = buf.readDouble()
+            client.execute {
+                (client.currentScreen as? ElectricLiftScreen)?.screenHandler?.energyStored = double
+            }
+        }
         ClientPlayNetworking.registerGlobalReceiver(SPAWN_PLATFORM_ENTITY) {client, handler, buf, _ ->
             val id = buf.readVarInt()
             val uuid = buf.readUuid()
@@ -26,6 +32,7 @@ object PacketCompendium {
 
             val tag = buf.readCompoundTag()
             val finalElevation = buf.readDouble()
+            val speed = buf.readDouble()
 
             client.execute {
                 val world = handler.world
@@ -43,6 +50,7 @@ object PacketCompendium {
 
                 entity.initialElevation = y
                 entity.finalElevation = finalElevation
+                entity.speed = speed
 
                 world.addEntity(id, entity)
             }
