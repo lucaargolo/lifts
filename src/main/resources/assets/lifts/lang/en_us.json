@@ -23,6 +23,8 @@
   "screen.lifts.title.no_energy": "No energy",
   "screen.lifts.title.unlinked": "Unlinked",
 
+  "screen.lifts.please_use_linking_tool": "To link this screen, please <KEY1> + <KEY2> with a linking tool in a lift and then <KEY2> in this screen.",
+
   "screen.lifts.common.write_name": "Please write the desired name",
   "screen.lifts.common.set_name": "Set name",
   "screen.lifts.common.reset_name": "Reset name",

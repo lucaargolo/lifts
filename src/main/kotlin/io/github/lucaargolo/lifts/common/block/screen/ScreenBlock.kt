@@ -41,8 +41,8 @@ class ScreenBlock(settings: Settings): BlockWithEntity(settings) {
             if(screenBlockEntity.clickDelay == 0 && (mousePos.first != 0.0 || mousePos.second != 0.0)) {
                 screenBlockEntity.clickDelay = 5
                 screenBlockEntity.screen?.mouseClicked(mousePos.first, mousePos.second, 0)
-                return ActionResult.SUCCESS
             }
+            return ActionResult.SUCCESS
         }
         return super.onUse(state, world, pos, player, hand, hit)
     }
