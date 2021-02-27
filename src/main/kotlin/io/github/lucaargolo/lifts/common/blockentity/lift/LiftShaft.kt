@@ -83,7 +83,7 @@ class LiftShaft private constructor(val key: RegistryKey<World>, val x: Int, val
         val state = world.getBlockState(frontPos)
         val distance = MathHelper.abs(destination.pos.y - frontPos.y)
 
-        if(!state.isFullCube(world, frontPos)) {
+        if(!state.isFullCube(world, frontPos) || state.block.hasBlockEntity()) {
             return cacheAndReturn(LiftActionResult.INVALID_PLATFORM, destination, simulation)
         }else if(distance > lift.platformRange) {
             return cacheAndReturn(LiftActionResult.NO_RANGE, destination, simulation)

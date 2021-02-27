@@ -16,6 +16,8 @@ class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LI
     private var energyCapacity = 0.0
     private var energyStored = 0.0
 
+    override fun getMaxOutput(side: EnergySide?) = 0.0
+
     override fun getMaxStoredPower() = this.energyCapacity
 
     override fun getTier() = this.energyTier

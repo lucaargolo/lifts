@@ -97,12 +97,14 @@ class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN
 
     override fun getMaxStoredPower() = 16000.0
 
+    override fun getMaxOutput(side: EnergySide?) = 0.0
+
     override fun getTier() = EnergyTier.LOW
 
-    override fun getStored(p0: EnergySide?) = storedEnergy
+    override fun getStored(side: EnergySide?) = storedEnergy
 
-    override fun setStored(p0: Double) {
-        storedEnergy = p0
+    override fun setStored(storedEnergy: Double) {
+        this.storedEnergy = storedEnergy
     }
 
 }

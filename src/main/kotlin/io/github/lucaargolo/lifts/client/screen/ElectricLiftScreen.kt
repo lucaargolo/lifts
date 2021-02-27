@@ -20,7 +20,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
     override fun init() {
         super.init()
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2
-        this.addButton(ButtonWidget(x+61, y+51, 90, 20, TranslatableText("screen.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
+        this.addButton(ButtonWidget(x+61, y+51, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
     }
 
     override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
@@ -28,7 +28,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
         super.render(matrices, mouseX, mouseY, delta)
         drawMouseoverTooltip(matrices, mouseX, mouseY)
         if((x+8..x+16).contains(mouseX) && (y+17..y+69).contains(mouseY)) {
-            val a = TranslatableText("screen.common.stored_energy").append(": ")
+            val a = TranslatableText("screen.lifts.common.stored_energy").append(": ")
             val b = LiteralText("${handler.energyStored}/${handler.entity.maxStoredPower} E")
             renderTooltip(matrices, listOf(a, b), mouseX, mouseY)
         }
@@ -37,7 +37,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
     override fun drawForeground(matrices: MatrixStack, mouseX: Int, mouseY: Int) {
         super.drawForeground(matrices, mouseX, mouseY)
         itemRenderer.renderInGui(ItemStack(handler.entity.lift), 26, 18)
-        textRenderer.draw(matrices, TranslatableText("screen.common.name").append(": ${handler.entity.liftName ?: "Default"}"), 61f, 20f, 4210752)
+        textRenderer.draw(matrices, TranslatableText("screen.lifts.common.name").append(": ${handler.entity.liftName ?: "Default"}"), 61f, 20f, 4210752)
     }
 
     override fun drawBackground(matrices: MatrixStack, delta: Float, mouseX: Int, mouseY: Int) {

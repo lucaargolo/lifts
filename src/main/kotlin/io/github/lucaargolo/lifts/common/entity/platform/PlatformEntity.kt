@@ -125,7 +125,7 @@ class PlatformEntity: Entity {
             for(z in (minZ..maxZ)) {
                 val pos = BlockPos(x, y, z)
                 val state = world.getBlockState(pos)
-                matrixRow[z - minZ] = if(state.isFullCube(world, pos)) {
+                matrixRow[z - minZ] = if(state.isFullCube(world, pos) && !state.block.hasBlockEntity()) {
                     world.setBlockState(pos, Blocks.AIR.defaultState)
                     state
                 }else{

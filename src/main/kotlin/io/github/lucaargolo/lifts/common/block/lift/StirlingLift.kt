@@ -23,7 +23,7 @@ class StirlingLift(settings: Settings, platformSpeed: Double, platformRange: Int
 
     override fun onUse(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
         player.openHandledScreen(object: ExtendedScreenHandlerFactory {
-            override fun getDisplayName() = TranslatableText("screen.title.stirling_lift")
+            override fun getDisplayName() = TranslatableText("screen.lifts.title.stirling_lift")
 
             override fun createMenu(syncId: Int, inv: PlayerInventory, player: PlayerEntity): ScreenHandler {
                 return StirlingLiftScreenHandler(syncId, inv, world.getBlockEntity(pos) as StirlingLiftBlockEntity)

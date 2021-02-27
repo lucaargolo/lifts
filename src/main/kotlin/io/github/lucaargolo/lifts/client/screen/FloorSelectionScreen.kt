@@ -16,7 +16,7 @@ import net.minecraft.text.TranslatableText
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
 
-class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(TranslatableText("screen.title.floor_selection")) {
+class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(TranslatableText("screen.lifts.title.floor_selection")) {
 
     private val scrollTexture = Identifier("textures/gui/container/villager2.png")
     private val buttonLiftReference = linkedMapOf<LiftBlockEntity, ButtonWidget>()
@@ -109,12 +109,12 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
         buttonLiftReference.forEach { (lift, btn) ->
             if(lift.isPlatformHere) {
                 btn.active = false
-                tooltipBtnReference[btn] = TranslatableText("screen.tooltip.already_here")
+                tooltipBtnReference[btn] = TranslatableText("screen.lifts.tooltip.already_here")
             }else{
                 val actionResult = client?.world?.let { world -> blockEntity.liftShaft?.sendPlatformTo(world, lift, true) }
                 if(actionResult?.isAccepted() == false) {
                     btn.active = false
-                    tooltipBtnReference[btn] = TranslatableText("screen.tooltip.${actionResult.name.toLowerCase()}")
+                    tooltipBtnReference[btn] = TranslatableText("screen.lifts.tooltip.${actionResult.name.toLowerCase()}")
                 }else{
                     btn.active = true
                     tooltipBtnReference.remove(btn)
@@ -138,7 +138,7 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
             3 -> "rd"
             else -> "th"
         }
-        return lift.liftName?.let { LiteralText(it) } ?: LiteralText("$floor").append(TranslatableText("screen.number.$suffix")).append(" ").append(TranslatableText("screen.common.floor"))
+        return lift.liftName?.let { LiteralText(it) } ?: LiteralText("$floor").append(TranslatableText("screen.lifts.number.$suffix")).append(" ").append(TranslatableText("screen.lifts.common.floor"))
     }
 
 

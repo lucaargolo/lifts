@@ -80,7 +80,10 @@ class ScreenBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
 
         val facing = state[Properties.HORIZONTAL_FACING]
         modelList.getOrNull(facing.id-2)?.emitFromVanilla(state, context, randomSupplier) {
-            it.face.axis == facing.axis || world?.getBlockState(pos.add(it.face.vector))?.block != BlockCompendium.SCREEN
+            it.face.axis == facing.axis || let { _ ->
+                val neighborState = world?.getBlockState(pos.add(it.face.vector)) ?: return@let true
+                neighborState.block != BlockCompendium.SCREEN || neighborState[Properties.HORIZONTAL_FACING] != facing
+            }
         }
         context.emitter.drawSide(facing, world, pos)
 

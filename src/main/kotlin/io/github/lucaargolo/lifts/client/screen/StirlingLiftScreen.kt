@@ -19,7 +19,7 @@ class StirlingLiftScreen(handler: StirlingLiftScreenHandler, inventory: PlayerIn
     override fun init() {
         super.init()
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2
-        this.addButton(ButtonWidget(x+61, y+51, 90, 20, TranslatableText("screen.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
+        this.addButton(ButtonWidget(x+61, y+51, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
     }
 
     override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
@@ -31,9 +31,9 @@ class StirlingLiftScreen(handler: StirlingLiftScreenHandler, inventory: PlayerIn
     override fun drawForeground(matrices: MatrixStack, mouseX: Int, mouseY: Int) {
         super.drawForeground(matrices, mouseX, mouseY)
         itemRenderer.renderInGui(ItemStack(handler.entity.lift), 26, 18)
-        textRenderer.draw(matrices, TranslatableText("screen.common.name").append(": ${handler.entity.liftName ?: "Default"}"), 61f, 20f, 4210752)
-        textRenderer.draw(matrices, TranslatableText("screen.common.burning_ticks").append(": ${handler.burningTicks}"), 61f, 30f, 4210752)
-        textRenderer.draw(matrices, TranslatableText("screen.common.stored_ticks").append(": ${handler.storedTicks}"), 61f, 40f, 4210752)
+        textRenderer.draw(matrices, TranslatableText("screen.lifts.common.name").append(": ${handler.entity.liftName ?: "Default"}"), 61f, 20f, 4210752)
+        textRenderer.draw(matrices, TranslatableText("screen.lifts.common.burning_ticks").append(": ${handler.burningTicks}"), 61f, 30f, 4210752)
+        textRenderer.draw(matrices, TranslatableText("screen.lifts.common.stored_ticks").append(": ${handler.storedTicks}"), 61f, 40f, 4210752)
     }
 
     override fun drawBackground(matrices: MatrixStack, delta: Float, mouseX: Int, mouseY: Int) {
