@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iIi",
+    "iWi",
+    "iRi"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:iron_ingot"
+    },
+    "I": {
+      "item": "lifts:gold_structure"
+    },
+    "W": {
+      "item": "lifts:machine_block"
+    },
+    "R": {
+      "item": "minecraft:redstone_block"
+    }
+  },
+  "result": {
+    "item": "lifts:electric_lift_mk2",
+    "count": 1
+  }
+}

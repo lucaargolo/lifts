@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "lifts:block/diamond_structure"
+    }
+  }
+}

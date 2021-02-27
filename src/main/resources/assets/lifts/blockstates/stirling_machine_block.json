@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "lifts:block/stirling_machine_block"
+    }
+  }
+}

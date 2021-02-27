@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "lifts:block/machine_block_slab"
+    },
+    "type=double": {
+      "model": "lifts:block/machine_block"
+    },
+    "type=top": {
+      "model": "lifts:block/machine_block_slab_top"
+    }
+  }
+}

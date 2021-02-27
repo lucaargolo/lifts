@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iIi",
+    "IXI",
+    "iIi"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:diamond"
+    },
+    "I": {
+      "item": "minecraft:iron_nugget"
+    },
+    "X": {
+      "item": "minecraft:iron_bars"
+    }
+  },
+  "result": {
+    "item": "lifts:diamond_structure",
+    "count": 1
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "iIi",
+    "iWi",
+    "iRi"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:cobblestone"
+    },
+    "I": {
+      "item": "lifts:coal_structure"
+    },
+    "W": {
+      "item": "lifts:stirling_machine_block"
+    },
+    "R": {
+      "item": "minecraft:lever"
+    }
+  },
+  "result": {
+    "item": "lifts:stirling_lift",
+    "count": 1
+  }
+}

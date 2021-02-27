@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " E ",
+    "#T#",
+    " # "
+  ],
+  "key": {
+    "#": {
+      "tag": "minecraft:buttons"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    },
+    "T": {
+      "item": "lifts:machine_block_slab"
+    }
+  },
+  "result": {
+    "item": "lifts:lift_button",
+    "count": 3
+  }
+}

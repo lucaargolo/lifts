@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " #E",
+    " i#",
+    "i  "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:redstone"
+    },
+    "E": {
+      "item": "minecraft:ender_eye"
+    },
+    "i": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "lifts:linking_tool",
+    "count": 1
+  }
+}

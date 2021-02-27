@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "lifts:machine_block"
+    }
+  ],
+  "result": {
+    "item": "lifts:machine_block_slab",
+    "count": 2
+  }
+}

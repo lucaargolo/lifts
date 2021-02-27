@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "ici",
+    "cPc",
+    "ici"
+  ],
+  "key": {
+    "i": {
+      "item": "minecraft:cobblestone"
+    },
+    "c": {
+      "item": "minecraft:coal"
+    },
+    "P": {
+      "item": "minecraft:piston"
+    }
+  },
+  "result": {
+    "item": "lifts:stirling_machine_block",
+    "count": 1
+  }
+}

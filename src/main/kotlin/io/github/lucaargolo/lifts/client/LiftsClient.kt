@@ -34,7 +34,13 @@ class LiftsClient: ClientModInitializer {
             BlockCompendium.ELECTRIC_LIFT_MK2,
             BlockCompendium.ELECTRIC_LIFT_MK3,
             BlockCompendium.ELECTRIC_LIFT_MK4,
-            BlockCompendium.ELECTRIC_LIFT_MK5
+            BlockCompendium.ELECTRIC_LIFT_MK5,
+            BlockCompendium.COAL_STRUCTURE,
+            BlockCompendium.IRON_STRUCTURE,
+            BlockCompendium.GOLD_STRUCTURE,
+            BlockCompendium.DIAMOND_STRUCTURE,
+            BlockCompendium.EMERALD_STRUCTURE,
+            BlockCompendium.NETHERITE_STRUCTURE
         )
     }
 }

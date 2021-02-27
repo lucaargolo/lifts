@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/slab",
+  "textures": {
+    "bottom": "lifts:block/machine_base",
+    "top": "lifts:block/machine_base",
+    "side": "lifts:block/machine_base"
+  }
+}

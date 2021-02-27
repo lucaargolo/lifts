@@ -1,8 +1,8 @@
 {
   "parent": "minecraft:block/orientable",
   "textures": {
-    "top": "lifts:block/stirling_lift_base",
+    "top": "lifts:block/stirling_machine_base",
     "front": "lifts:block/stirling_lift_front",
-    "side": "lifts:block/stirling_lift_base"
+    "side": "lifts:block/stirling_machine_base"
   }
 }

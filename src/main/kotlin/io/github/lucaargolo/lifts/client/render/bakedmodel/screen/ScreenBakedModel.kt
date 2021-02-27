@@ -39,7 +39,7 @@ class ScreenBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
     private val spriteIdList = mutableListOf(
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/screen_border")),
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/screen_front")),
-        SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/screen_base")),
+        SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/machine_base")),
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/screen_side"))
     )
     private val spriteList = mutableListOf<Sprite>()
