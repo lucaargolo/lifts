@@ -28,9 +28,11 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
     private var excessHeight = 0.0
 
     override fun init() {
+        this.children.clear()
         this.buttons.clear()
         buttonLiftReference.clear()
         heightBtnReference.clear()
+        tooltipBtnReference.clear()
 
         scrollableOffset = 0.0
         excessHeight = 0.0

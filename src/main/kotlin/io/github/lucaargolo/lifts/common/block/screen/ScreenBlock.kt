@@ -1,6 +1,7 @@
 package io.github.lucaargolo.lifts.common.block.screen
 
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
+import io.github.lucaargolo.lifts.common.item.wrench.LinkingTool
 import net.minecraft.block.*
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemPlacementContext
@@ -35,6 +36,9 @@ class ScreenBlock(settings: Settings): BlockWithEntity(settings) {
 
     @Suppress("DEPRECATION")
     override fun onUse(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
+        if(player.getStackInHand(hand).item is LinkingTool) {
+            return ActionResult.PASS
+        }
         val facing = state[Properties.HORIZONTAL_FACING]
         (world.getBlockEntity(pos) as? ScreenBlockEntity)?.let{ screenBlockEntity ->
             val mousePos = ScreenBlockHandler.getMousePosition(hit, facing, pos)
