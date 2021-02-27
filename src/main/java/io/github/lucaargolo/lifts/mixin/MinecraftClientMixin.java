@@ -19,11 +19,11 @@ public class MinecraftClientMixin {
     @Shadow @Nullable public HitResult crosshairTarget;
     @Shadow @Nullable public ClientWorld world;
 
-    @Inject(at = @At("HEAD"), method = "openScreen", cancellable = true)
-    public void openScreen(Screen screen, CallbackInfo info) {
-        boolean shouldCancel = ScreenBlockHandler.INSTANCE.openScreenHook(crosshairTarget, world, screen);
-        if(shouldCancel) info.cancel();
-    }
+//    @Inject(at = @At("HEAD"), method = "openScreen", cancellable = true)
+//    public void openScreen(Screen screen, CallbackInfo info) {
+//        boolean shouldCancel = ScreenBlockHandler.INSTANCE.openScreenHook(crosshairTarget, world, screen);
+//        if(shouldCancel) info.cancel();
+//    }
 
     @Inject(at = @At("TAIL"), method = "<init>")
     public void init(RunArgs args, CallbackInfo info) {

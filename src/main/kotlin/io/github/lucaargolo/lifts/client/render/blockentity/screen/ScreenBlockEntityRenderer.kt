@@ -29,7 +29,7 @@ class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockE
                 when(entity.state) {
                     ScreenBlockEntity.State.NO_ENERGY -> NoEnergyScreen()
                     ScreenBlockEntity.State.UNLINKED -> UnlinkedScreen()
-                    ScreenBlockEntity.State.LINKED -> entity.linkedPos?.let{ linkedPos -> (entity.world?.getBlockEntity(linkedPos) as? LiftBlockEntity)?.let { FloorSelectionScreen(it) } }
+                    ScreenBlockEntity.State.LINKED -> entity.linkedLift?.let { FloorSelectionScreen(it) }
                 }?.let { screen ->
                     screen.init(client, framebuffer.textureWidth, framebuffer.textureHeight)
                     entity.screen = screen

@@ -1,10 +1,10 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "lifts:block/screen_base",
+		"0": "lifts:block/machine_base",
 		"1": "lifts:block/screen_side",
 		"2": "lifts:block/screen_front",
-		"particle": "lifts:block/screen_base"
+		"particle": "lifts:block/machine_base"
 	},
 	"elements": [
 		{

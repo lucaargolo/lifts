@@ -19,17 +19,26 @@ import java.util.function.Function
 
 object BakedModelCompendium: GenericCompendium<BakedModel>() {
 
-    val SCREEN_MODEL = register(ModIdentifier("screen"), ScreenBakedModel())
-    val ELECTRIC_LIFT_MODEL = register(ModIdentifier("electric_lift"), ElectricLiftBakedModel())
+    private val SCREEN_MODEL = ScreenBakedModel()
+    private val ELECTRIC_LIFT_MODEL = ElectricLiftBakedModel()
+
+    init {
+        register(ModIdentifier("screen"), SCREEN_MODEL)
+        register(ModIdentifier("electric_lift_mk1"), ELECTRIC_LIFT_MODEL)
+        register(ModIdentifier("electric_lift_mk2"), ELECTRIC_LIFT_MODEL)
+        register(ModIdentifier("electric_lift_mk3"), ELECTRIC_LIFT_MODEL)
+        register(ModIdentifier("electric_lift_mk4"), ELECTRIC_LIFT_MODEL)
+        register(ModIdentifier("electric_lift_mk5"), ELECTRIC_LIFT_MODEL)
+    }
 
     override fun initialize() {
         ModelLoadingRegistry.INSTANCE.registerVariantProvider {
             ModelVariantProvider { modelIdentifier, _ ->
                 map.forEach { (identifier, model) ->
                     val equals = if(identifier is ModelIdentifier) {
-                        identifier.namespace == modelIdentifier.namespace && modelIdentifier.path.startsWith(identifier.path) && identifier.variant == modelIdentifier.variant
+                        identifier.namespace == modelIdentifier.namespace && modelIdentifier.path == identifier.path && identifier.variant == modelIdentifier.variant
                     } else {
-                        identifier.namespace == modelIdentifier.namespace && modelIdentifier.path.startsWith(identifier.path)
+                        identifier.namespace == modelIdentifier.namespace && modelIdentifier.path == identifier.path
                     }
                     if(equals) {
                         return@ModelVariantProvider (model as? UnbakedModel) ?: object : UnbakedModel {

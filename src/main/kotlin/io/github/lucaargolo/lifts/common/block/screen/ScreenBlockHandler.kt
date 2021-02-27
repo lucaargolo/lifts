@@ -29,21 +29,21 @@ object ScreenBlockHandler {
         return screenFramebuffer?.textureWidth ?: 0
     }
 
-    fun openScreenHook(hit: HitResult?, world: World?, screen: Screen?): Boolean {
-        if (world != null && hit is BlockHitResult) {
-            val pos = hit.blockPos
-            (world.getBlockEntity(pos) as? ScreenBlockEntity)?.let{ blockEntity ->
-                if (blockEntity.clickDelay == 5) {
-                    screen?.let {
-                        it.init(MinecraftClient.getInstance(), getFramebufferWidth(), getFramebufferHeight())
-                        blockEntity.screen = it
-                    }
-                    return true
-                }
-            }
-        }
-        return false
-    }
+//    fun openScreenHook(hit: HitResult?, world: World?, screen: Screen?): Boolean {
+//        if (world != null && hit is BlockHitResult) {
+//            val pos = hit.blockPos
+//            (world.getBlockEntity(pos) as? ScreenBlockEntity)?.let{ blockEntity ->
+//                if (blockEntity.clickDelay == 5) {
+//                    screen?.let {
+//                        it.init(MinecraftClient.getInstance(), getFramebufferWidth(), getFramebufferHeight())
+//                        blockEntity.screen = it
+//                    }
+//                    return true
+//                }
+//            }
+//        }
+//        return false
+//    }
 
     fun mouseScrollHook(hit: HitResult?, world: World?, vertical: Double): Boolean {
         if (world != null && hit is BlockHitResult) {

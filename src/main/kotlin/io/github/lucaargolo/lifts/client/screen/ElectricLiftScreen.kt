@@ -4,6 +4,9 @@ import io.github.lucaargolo.lifts.common.containers.lift.ElectricLiftScreenHandl
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.widget.ButtonWidget
+import net.minecraft.client.render.OverlayTexture
+import net.minecraft.client.render.VertexConsumerProvider.Immediate
+import net.minecraft.client.render.model.json.ModelTransformation
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.player.PlayerInventory
 import net.minecraft.item.ItemStack
@@ -20,14 +23,14 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
     override fun init() {
         super.init()
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2
-        this.addButton(ButtonWidget(x+61, y+51, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
+        this.addButton(ButtonWidget(x+43, y+50, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
     }
 
     override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
         this.renderBackground(matrices)
         super.render(matrices, mouseX, mouseY, delta)
         drawMouseoverTooltip(matrices, mouseX, mouseY)
-        if((x+8..x+16).contains(mouseX) && (y+17..y+69).contains(mouseY)) {
+        if((x+25..x+33).contains(mouseX) && (y+17..y+69).contains(mouseY)) {
             val a = TranslatableText("screen.lifts.common.stored_energy").append(": ")
             val b = LiteralText("${handler.energyStored}/${handler.entity.maxStoredPower} E")
             renderTooltip(matrices, listOf(a, b), mouseX, mouseY)
@@ -36,8 +39,8 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
 
     override fun drawForeground(matrices: MatrixStack, mouseX: Int, mouseY: Int) {
         super.drawForeground(matrices, mouseX, mouseY)
-        itemRenderer.renderInGui(ItemStack(handler.entity.lift), 26, 18)
-        textRenderer.draw(matrices, TranslatableText("screen.lifts.common.name").append(": ${handler.entity.liftName ?: "Default"}"), 61f, 20f, 4210752)
+        val text = TranslatableText("screen.lifts.common.name").append(": ${handler.entity.liftName ?: "Default"}")
+        textRenderer.draw(matrices, text, (backgroundWidth/2f - textRenderer.getWidth(text)/2f), 40f, 4210752)
     }
 
     override fun drawBackground(matrices: MatrixStack, delta: Float, mouseX: Int, mouseY: Int) {
@@ -45,7 +48,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight)
         val energyPercentage = handler.energyStored/handler.entity.maxStoredPower
         val energyOffset = MathHelper.lerp(energyPercentage, 0.0, 52.0).toInt()
-        drawTexture(matrices, x+8, y+17+(52-energyOffset), 176, 0, 8, energyOffset)
+        drawTexture(matrices, x+25, y+17+(52-energyOffset), 176, 0, 8, energyOffset)
     }
 
 }

@@ -1,7 +1,7 @@
 package io.github.lucaargolo.lifts.common.block.screen
 
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
-import io.github.lucaargolo.lifts.common.item.wrench.LinkingTool
+import io.github.lucaargolo.lifts.common.item.linking.LinkingTool
 import net.minecraft.block.*
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemPlacementContext

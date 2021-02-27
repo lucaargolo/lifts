@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "state=not_linked": {
+      "model": "lifts:block/lift_detector_not_linked"
+    },
+    "state=not_here": {
+      "model": "lifts:block/lift_detector_not_here"
+    },
+    "state=here": {
+      "model": "lifts:block/lift_detector_here"
+    }
+  }
+}

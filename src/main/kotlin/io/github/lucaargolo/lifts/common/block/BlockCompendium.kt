@@ -1,8 +1,11 @@
 package io.github.lucaargolo.lifts.common.block
 
 import io.github.lucaargolo.lifts.Lifts.Companion.creativeGroupSettings
+import io.github.lucaargolo.lifts.common.block.charger.Charger
 import io.github.lucaargolo.lifts.common.block.lift.ElectricLift
 import io.github.lucaargolo.lifts.common.block.lift.StirlingLift
+import io.github.lucaargolo.lifts.common.block.misc.LiftButton
+import io.github.lucaargolo.lifts.common.block.misc.LiftDetector
 import io.github.lucaargolo.lifts.common.block.screen.ScreenBlock
 import io.github.lucaargolo.lifts.mixin.KeyBindingAccessor
 import io.github.lucaargolo.lifts.utils.RegistryCompendium
@@ -34,6 +37,12 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
     val ELECTRIC_LIFT_MK4 = register("electric_lift_mk4", ElectricLift(AbstractBlock.Settings.copy(Blocks.EMERALD_BLOCK), 1.8, 128, 256000.0, EnergyTier.EXTREME))
     val ELECTRIC_LIFT_MK5 = register("electric_lift_mk5", ElectricLift(AbstractBlock.Settings.copy(Blocks.NETHERITE_BLOCK), 2.0, 256, 512000.0, EnergyTier.INSANE))
 
+    val LIFT_DETECTOR = register("lift_detector", LiftDetector(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK)))
+
+    val LIFT_BUTTON = register("lift_button", LiftButton(AbstractBlock.Settings.copy(Blocks.STONE_BUTTON)))
+
+    val SCREEN_CHARGER = register("screen_charger", Charger(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK)))
+
     val SCREEN = register("screen", ScreenBlock(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK)))
 
     fun registerBlockItems(itemMap: MutableMap<Identifier, Item>) {
@@ -61,7 +70,12 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
                         }
                     }
                 }
-                else -> BlockItem(block, creativeGroupSettings())
+                else -> object: BlockItem(block, creativeGroupSettings()) {
+                    override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
+                        super.appendTooltip(stack, world, tooltip, context)
+                        tooltip.add(TranslatableText("tooltip.lifts.${identifier.path}").formatted(Formatting.ITALIC, Formatting.DARK_PURPLE))
+                    }
+                }
             }
         }
     }

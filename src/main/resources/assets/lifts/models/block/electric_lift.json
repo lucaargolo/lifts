@@ -1,9 +1,9 @@
 {
   "parent": "block/block",
   "textures": {
-    "top": "lifts:block/electric_lift_base",
+    "top": "lifts:block/machine_base",
     "front": "lifts:block/electric_lift_front",
-    "side": "lifts:block/electric_lift_base"
+    "side": "lifts:block/machine_base"
   },
   "elements": [
     {
