@@ -42,8 +42,9 @@ object LateTooltipHolder: DrawableHelper() {
         if (lines.isNotEmpty()) {
             val maxLength = lines.map { client.textRenderer.getWidth(it) }.maxOrNull() ?: 0
 
-            val x = client.window.width/(client.options.guiScale*2) - 24
-            var y = client.window.height/(client.options.guiScale*2) - 24
+            val scaleFactor = client.window.calculateScaleFactor(client.options.guiScale, client.forcesUnicodeFont())
+            val x = client.window.width/(scaleFactor*2) - 24
+            var y = client.window.height/(scaleFactor*2) - 24
 
             var n = 8
             if (lines.size > 1) {
