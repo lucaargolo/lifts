@@ -16,7 +16,7 @@ import net.minecraft.util.math.Direction
 
 abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEntity(type), Tickable {
 
-    protected var prevReachableLifts = 0
+    private var prevReachableLifts = 0
 
     var lift: Lift? = null
     var liftName: String? = null
@@ -46,6 +46,7 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEn
     }
 
     override fun markRemoved() {
+        super.markRemoved()
         liftShaft?.removeLift(this)
     }
 
