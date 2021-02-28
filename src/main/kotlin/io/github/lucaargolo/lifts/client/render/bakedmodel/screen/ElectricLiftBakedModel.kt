@@ -38,7 +38,7 @@ class ElectricLiftBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
     private val modelList = mutableListOf<BakedModel>()
 
     private val spriteIdList = mutableListOf(
-        SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/electric_lift_base")),
+        SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/machine_base")),
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/electric_lift_front")),
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/mk1_overlay")),
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/mk2_overlay")),

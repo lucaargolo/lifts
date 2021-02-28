@@ -60,7 +60,7 @@ class PlatformEntity: Entity {
             val h = abs(finalElevation-initialElevation)
             val p = if(progress <= 0.5) progress else 1-progress
             val e = min(p*(1/(5/h)), 1.0)
-            val vel = d*easeInOutSine(e)
+            val vel = d*easeInOutSine(e)*(speed/2)
             val oldElevation = pos.y
             move(MovementType.SELF, Vec3d(0.0, (vel+(d*0.1))*0.5, 0.0))
             val elevationOffset = pos.y - oldElevation

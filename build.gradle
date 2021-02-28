@@ -34,8 +34,8 @@ dependencies {
     modApi "teamreborn:energy:${project.energy_version}"
     include "teamreborn:energy:${project.energy_version}"
 
-    modImplementation "io.github.prospector:modmenu:${project.modmenu_version}"
-    modImplementation "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
+    modRuntime "io.github.prospector:modmenu:${project.modmenu_version}"
+    modRuntime "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
 }
 
 processResources {

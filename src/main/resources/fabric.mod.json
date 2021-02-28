@@ -3,14 +3,14 @@
   "id": "lifts",
   "version": "${version}",
   "name": "Lifts",
-  "description": "A mod about lifts",
+  "description": "A technology mod that adds various lifts for better vertical traversal inside your world.",
   "authors": [
     "D4rkness_King"
   ],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/kibe",
-    "sources": "https://github.com/lucaargolo/kibe",
-    "issues": "https://github.com/lucaargolo/kibe/issues"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/lifts",
+    "sources": "https://github.com/lucaargolo/lifts",
+    "issues": "https://github.com/lucaargolo/lifts/issues"
   },
 
   "license": "Mozilla Public License 2.0",

@@ -96,6 +96,7 @@ class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN
     override fun toTag(tag: CompoundTag): CompoundTag {
         tag.putDouble("storedEnergy", storedEnergy)
         linkedLift?.let { tag.putLong("linkedLift", it.pos.asLong()) }
+        linkedPos?.let { tag.putLong("linkedLift", it.asLong()) }
         tag.putString("state", state.name)
         return super.toTag(tag)
     }
