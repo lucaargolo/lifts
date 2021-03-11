@@ -31,7 +31,7 @@ class StirlingLiftScreenHandler(syncId: Int, playerInventory: PlayerInventory, v
         entity.onOpen(playerInventory.player)
 
         addSlot(object: Slot(entity, 0, 26, 53) {
-            override fun canInsert(stack: ItemStack) = FuelRegistry.INSTANCE.get(stack.item) > 0
+            override fun canInsert(stack: ItemStack) = FuelRegistry.INSTANCE.get(stack.item) ?: 0 > 0
         })
 
         (0..2).forEach { n ->

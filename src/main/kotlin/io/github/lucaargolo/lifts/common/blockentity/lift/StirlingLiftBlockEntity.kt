@@ -52,7 +52,7 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
     override fun setStack(slot: Int, stack: ItemStack) = let { this.inventory[slot] = stack }
 
     override fun getAvailableSlots(side: Direction?) = intArrayOf(0)
-    override fun canInsert(slot: Int, stack: ItemStack, dir: Direction?) = FuelRegistry.INSTANCE.get(stack.item) > 0
+    override fun canInsert(slot: Int, stack: ItemStack, dir: Direction?) = FuelRegistry.INSTANCE.get(stack.item) ?: 0 > 0
     override fun canExtract(slot: Int, stack: ItemStack, dir: Direction?) = false
 
     override fun getReachableLifts(): Int {
@@ -93,7 +93,7 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
     }
 
     private fun getFuelTime(fuel: ItemStack): Int {
-        return if(fuel.isEmpty) 0 else FuelRegistry.INSTANCE.get(fuel.item)
+        return if(fuel.isEmpty) 0 else FuelRegistry.INSTANCE.get(fuel.item) ?: 0
     }
 
     override fun preSendRequirements(distance: Int): LiftActionResult {
