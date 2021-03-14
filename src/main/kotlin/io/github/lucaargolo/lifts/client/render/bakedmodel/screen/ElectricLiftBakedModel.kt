@@ -53,16 +53,16 @@ class ElectricLiftBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
     override fun getTextureDependencies(unbakedModelGetter: Function<Identifier, UnbakedModel>, unresolvedTextureReferences: MutableSet<Pair<String, String>>) = spriteIdList
 
     override fun bake(loader: ModelLoader, textureGetter: Function<SpriteIdentifier, Sprite>, rotationContainer: ModelBakeSettings, modelId: Identifier): BakedModel {
-        if(modelList.isEmpty() && spriteList.isEmpty()) {
-            modelIdList.forEach { modelIdentifier ->
-                loader.getOrLoadModel(modelIdentifier).bake(loader, textureGetter, ModelRotation.X0_Y0, modelId)?.let { modelList.add(it) } // NORTH
-                loader.getOrLoadModel(modelIdentifier).bake(loader, textureGetter, ModelRotation.X0_Y180, modelId)?.let { modelList.add(it) } //SOUTH
-                loader.getOrLoadModel(modelIdentifier).bake(loader, textureGetter, ModelRotation.X0_Y270, modelId)?.let { modelList.add(it) } //WEST
-                loader.getOrLoadModel(modelIdentifier).bake(loader, textureGetter, ModelRotation.X0_Y90, modelId)?.let { modelList.add(it) } //EAST
-            }
-            spriteIdList.forEach { spriteIdentifier ->
-                spriteList.add(textureGetter.apply(spriteIdentifier))
-            }
+        modelList.clear()
+        spriteList.clear()
+        modelIdList.forEach { modelIdentifier ->
+            loader.getOrLoadModel(modelIdentifier).bake(loader, textureGetter, ModelRotation.X0_Y0, modelId)?.let { modelList.add(it) } // NORTH
+            loader.getOrLoadModel(modelIdentifier).bake(loader, textureGetter, ModelRotation.X0_Y180, modelId)?.let { modelList.add(it) } //SOUTH
+            loader.getOrLoadModel(modelIdentifier).bake(loader, textureGetter, ModelRotation.X0_Y270, modelId)?.let { modelList.add(it) } //WEST
+            loader.getOrLoadModel(modelIdentifier).bake(loader, textureGetter, ModelRotation.X0_Y90, modelId)?.let { modelList.add(it) } //EAST
+        }
+        spriteIdList.forEach { spriteIdentifier ->
+            spriteList.add(textureGetter.apply(spriteIdentifier))
         }
         return this
     }
