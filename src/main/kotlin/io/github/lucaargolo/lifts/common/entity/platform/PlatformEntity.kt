@@ -92,16 +92,18 @@ class PlatformEntity: Entity {
 
     private fun removeBlockMatrix(): Int {
         val yPos = round(pos.y).toInt()
-        blockMatrix?.forEachIndexed { x, row ->
-            row?.forEachIndexed { z, state ->
-                val pos = BlockPos(blockPos.x+x, yPos, blockPos.z+z)
-                if(world.getBlockState(pos).isAir) {
-                    world.setBlockState(pos, state)
-                }else{
-                    (world as? ServerWorld)?.let { serverWorld ->
-                        val stacks = Block.getDroppedStacks(state, serverWorld, pos, null)
-                        stacks.forEach {
-                            ItemScatterer.spawn(world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it)
+        if(!world.isClient) {
+            blockMatrix?.forEachIndexed { x, row ->
+                row?.forEachIndexed { z, state ->
+                    val pos = BlockPos(blockPos.x + x, yPos, blockPos.z + z)
+                    if (world.getBlockState(pos).isAir) {
+                        world.setBlockState(pos, state)
+                    } else {
+                        (world as? ServerWorld)?.let { serverWorld ->
+                            val stacks = Block.getDroppedStacks(state, serverWorld, pos, null)
+                            stacks.forEach {
+                                ItemScatterer.spawn(world, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it)
+                            }
                         }
                     }
                 }
