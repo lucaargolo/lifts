@@ -20,7 +20,7 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import team.reborn.energy.EnergyTier
 
-class ElectricLift(settings: Settings, val eletricLiftConfig: ModConfig.ElectricLiftConfig, val energyTier: EnergyTier): Lift(settings, eletricLiftConfig) {
+class ElectricLift(settings: Settings, val electricLiftConfig: ModConfig.ElectricLiftConfig, val energyTier: EnergyTier): Lift(settings, electricLiftConfig) {
 
     override fun createBlockEntity(world: BlockView?) = ElectricLiftBlockEntity()
 

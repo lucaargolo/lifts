@@ -50,7 +50,7 @@ class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LI
         if(!initializedEnergy) {
             (lift as? ElectricLift)?.let {
                 energyTier = it.energyTier
-                energyCapacity = it.eletricLiftConfig.energyCapacity
+                energyCapacity = it.electricLiftConfig.energyCapacity
                 initializedEnergy = true
             }
         }
