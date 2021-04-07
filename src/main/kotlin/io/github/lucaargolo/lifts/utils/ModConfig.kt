@@ -22,9 +22,6 @@ class ModConfig {
         val electricLiftMk5: ElectricLiftConfig = ElectricLiftConfig(2.0, 256, 512000.0)
     )
 
-    val isScreenRenderedInWorld = true
-    val isChargePerLift = true
-
     val maxFuelTicksStored = 32000
     val fuelTicksNeededPerBlock = 100
 
