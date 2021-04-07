@@ -64,9 +64,11 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
                     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
                         super.appendTooltip(stack, world, tooltip, context)
                         tooltip.add(TranslatableText("tooltip.lifts.powered_by_coal").formatted(Formatting.ITALIC, Formatting.DARK_PURPLE))
-                        displayHiddenTooltip(tooltip) {
-                            tooltip.add(TranslatableText("tooltip.lifts.common.platform_speed").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformSpeed}").formatted(Formatting.GRAY)))
-                            tooltip.add(TranslatableText("tooltip.lifts.common.platform_range").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformRange} ").append(TranslatableText("tooltip.lifts.common.blocks")).formatted(Formatting.GRAY)))
+                        world?.let {
+                            displayHiddenTooltip(tooltip) {
+                                tooltip.add(TranslatableText("tooltip.lifts.common.platform_speed").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformSpeed}").formatted(Formatting.GRAY)))
+                                tooltip.add(TranslatableText("tooltip.lifts.common.platform_range").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformRange} ").append(TranslatableText("tooltip.lifts.common.blocks")).formatted(Formatting.GRAY)))
+                            }
                         }
                     }
                 }
@@ -74,11 +76,13 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
                     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
                         super.appendTooltip(stack, world, tooltip, context)
                         tooltip.add(TranslatableText("tooltip.lifts.powered_by_energy").formatted(Formatting.ITALIC, Formatting.DARK_PURPLE))
-                        displayHiddenTooltip(tooltip) {
-                            tooltip.add(TranslatableText("tooltip.lifts.common.platform_speed").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformSpeed}").formatted(Formatting.GRAY)))
-                            tooltip.add(TranslatableText("tooltip.lifts.common.platform_range").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformRange} ").append(TranslatableText("tooltip.lifts.common.blocks")).formatted(Formatting.GRAY)))
-                            tooltip.add(TranslatableText("tooltip.lifts.common.energy_input").formatted(Formatting.BLUE).append(LiteralText(": ${block.energyTier.maxInput} E/tick").formatted(Formatting.GRAY)))
-                            tooltip.add(TranslatableText("tooltip.lifts.common.energy_capacity").formatted(Formatting.BLUE).append(LiteralText(": ${block.electricLiftConfig.energyCapacity} E").formatted(Formatting.GRAY)))
+                        world?.let {
+                            displayHiddenTooltip(tooltip) {
+                                tooltip.add(TranslatableText("tooltip.lifts.common.platform_speed").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformSpeed}").formatted(Formatting.GRAY)))
+                                tooltip.add(TranslatableText("tooltip.lifts.common.platform_range").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformRange} ").append(TranslatableText("tooltip.lifts.common.blocks")).formatted(Formatting.GRAY)))
+                                tooltip.add(TranslatableText("tooltip.lifts.common.energy_input").formatted(Formatting.BLUE).append(LiteralText(": ${block.energyTier.maxInput} E/tick").formatted(Formatting.GRAY)))
+                                tooltip.add(TranslatableText("tooltip.lifts.common.energy_capacity").formatted(Formatting.BLUE).append(LiteralText(": ${block.electricLiftConfig.energyCapacity} E").formatted(Formatting.GRAY)))
+                            }
                         }
                     }
                 }
