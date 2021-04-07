@@ -49,7 +49,7 @@ class Lifts: ModInitializer {
         private val parser = JsonParser()
         private val gson = GsonBuilder().setPrettyPrinting().create()
 
-        val LOGGER: Logger = LogManager.getLogger("Terrarian Slimes")
+        val LOGGER: Logger = LogManager.getLogger("Lifts")
         val CONFIG: ModConfig by lazy {
             val configFile = File("${FabricLoader.getInstance().configDir}${File.separator}$MOD_ID.json")
             var finalConfig: ModConfig
