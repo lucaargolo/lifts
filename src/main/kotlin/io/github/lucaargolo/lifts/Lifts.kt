@@ -48,32 +48,32 @@ class Lifts: ModInitializer {
         private val creativeTab = FabricItemGroupBuilder.create(ModIdentifier("creative_tab")).icon{ ItemStack(BlockCompendium.ELECTRIC_LIFT_MK5) }.build()
         private val parser = JsonParser()
         private val gson = GsonBuilder().setPrettyPrinting().create()
-        private val logger: Logger = LogManager.getLogger("Terrarian Slimes")
 
+        val LOGGER: Logger = LogManager.getLogger("Terrarian Slimes")
         val CONFIG: ModConfig by lazy {
             val configFile = File("${FabricLoader.getInstance().configDir}${File.separator}$MOD_ID.json")
             var finalConfig: ModConfig
-            logger.info("Trying to read config file...")
+            LOGGER.info("Trying to read config file...")
             try {
                 if (configFile.createNewFile()) {
-                    logger.info("No config file found, creating a new one...")
+                    LOGGER.info("No config file found, creating a new one...")
                     val json: String = gson.toJson(parser.parse(gson.toJson(ModConfig())))
                     PrintWriter(configFile).use { out -> out.println(json) }
                     finalConfig = ModConfig()
-                    logger.info("Successfully created default config file.")
+                    LOGGER.info("Successfully created default config file.")
                 } else {
-                    logger.info("A config file was found, loading it..")
+                    LOGGER.info("A config file was found, loading it..")
                     finalConfig = gson.fromJson(String(Files.readAllBytes(configFile.toPath())), ModConfig::class.java)
                     if (finalConfig == null) {
                         throw NullPointerException("The config file was empty.")
                     } else {
-                        logger.info("Successfully loaded config file.")
+                        LOGGER.info("Successfully loaded config file.")
                     }
                 }
             } catch (exception: Exception) {
-                logger.error("There was an error creating/loading the config file!", exception)
+                LOGGER.error("There was an error creating/loading the config file!", exception)
                 finalConfig = ModConfig()
-                logger.warn("Defaulting to original config.")
+                LOGGER.warn("Defaulting to original config.")
             }
             finalConfig
         }

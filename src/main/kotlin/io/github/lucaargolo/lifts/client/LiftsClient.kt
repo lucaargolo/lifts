@@ -6,6 +6,7 @@ import io.github.lucaargolo.lifts.client.render.entity.EntityRendererCompendium
 import io.github.lucaargolo.lifts.common.block.BlockCompendium
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftShaft
 import io.github.lucaargolo.lifts.common.containers.ScreenHandlerCompendium
+import io.github.lucaargolo.lifts.compat.OptifineShadersCompat
 import io.github.lucaargolo.lifts.network.PacketCompendium
 import io.github.lucaargolo.lifts.utils.LateTooltipHolder
 import net.fabricmc.api.ClientModInitializer
@@ -22,7 +23,7 @@ class LiftsClient: ClientModInitializer {
         EntityRendererCompendium.initialize()
         BakedModelCompendium.initialize()
         LateTooltipHolder.onInitializeClient()
-
+        OptifineShadersCompat.initialize()
         ClientPlayConnectionEvents.JOIN.register { _, _, _ ->
             LiftShaft.clearClient()
         }

@@ -6,8 +6,8 @@ import io.github.lucaargolo.lifts.client.screen.FloorSelectionScreen
 import io.github.lucaargolo.lifts.client.screen.NoEnergyScreen
 import io.github.lucaargolo.lifts.client.screen.UnlinkedScreen
 import io.github.lucaargolo.lifts.common.block.screen.ScreenBlockHandler
-import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
+import io.github.lucaargolo.lifts.compat.OptifineShadersCompat
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.*
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
@@ -41,6 +41,7 @@ class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockE
         val hitResult = dispatcher.crosshairTarget
         val mousePos = ScreenBlockHandler.getMousePosition(hitResult, facing, entity.pos)
 
+        OptifineShadersCompat.startDrawingScreen()
         framebuffer.beginWrite(true)
 
         RenderSystem.clearColor(0.0f, 0.0f, 0.0f, 1.0f)
@@ -61,11 +62,10 @@ class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockE
         RenderSystem.matrixMode(5889)
         RenderSystem.popMatrix()
 
-        RenderSystem.enableDepthTest()
-
         framebuffer.endWrite()
-
-        client.framebuffer.beginWrite(true)
+        MinecraftClient.getInstance().framebuffer.beginWrite(true)
+        OptifineShadersCompat.endDrawingScreen()
+        RenderSystem.enableDepthTest()
 
         matrices.push()
         matrices.translate(0.5, 0.5, 0.5)
