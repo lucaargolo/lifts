@@ -1,5 +1,6 @@
 package io.github.lucaargolo.lifts.common.blockentity.lift
 
+import io.github.lucaargolo.lifts.Lifts
 import io.github.lucaargolo.lifts.common.block.lift.ElectricLift
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import net.minecraft.block.BlockState
@@ -35,7 +36,7 @@ class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LI
         var x = 0
         liftShaft?.lifts?.forEach {
             val distance = MathHelper.abs(it.pos.y - pos.y)
-            lift?.platformRange?.let { range ->
+            lift?.liftConfig?.platformRange?.let { range ->
                 if((0..range).contains(distance) && energyStored >= distance*ENERGY_PER_BLOCK) {
                     x++
                 }
@@ -49,7 +50,7 @@ class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LI
         if(!initializedEnergy) {
             (lift as? ElectricLift)?.let {
                 energyTier = it.energyTier
-                energyCapacity = it.energyCapacity
+                energyCapacity = it.eletricLiftConfig.energyCapacity
                 initializedEnergy = true
             }
         }
@@ -77,7 +78,7 @@ class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LI
     }
 
     companion object {
-        const val ENERGY_PER_BLOCK = 100.0
+        val ENERGY_PER_BLOCK = Lifts.CONFIG.energyUnitsNeededPerBlock
     }
 
 }

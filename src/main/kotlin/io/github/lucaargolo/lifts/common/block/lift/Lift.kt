@@ -1,6 +1,7 @@
 package io.github.lucaargolo.lifts.common.block.lift
 
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
+import io.github.lucaargolo.lifts.utils.ModConfig
 import net.minecraft.block.Block
 import net.minecraft.block.BlockRenderType
 import net.minecraft.block.BlockState
@@ -11,7 +12,7 @@ import net.minecraft.state.property.Properties
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
-abstract class Lift(settings: Settings, val platformSpeed: Double, val platformRange: Int): BlockWithEntity(settings) {
+abstract class Lift(settings: Settings, val liftConfig: ModConfig.LiftConfig): BlockWithEntity(settings) {
 
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
         builder.add(Properties.HORIZONTAL_FACING)

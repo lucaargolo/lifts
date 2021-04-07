@@ -1,5 +1,6 @@
 package io.github.lucaargolo.lifts.common.blockentity.lift
 
+import io.github.lucaargolo.lifts.Lifts
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import net.fabricmc.fabric.api.registry.FuelRegistry
 import net.minecraft.block.BlockState
@@ -59,7 +60,7 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
         var x = 0
         liftShaft?.lifts?.forEach {
             val distance = MathHelper.abs(it.pos.y - pos.y)
-            lift?.platformRange?.let { range ->
+            lift?.liftConfig?.platformRange?.let { range ->
                 if((0..range).contains(distance) && storedTicks >= distance * TICKS_PER_BLOCK) {
                     x++
                 }
@@ -130,8 +131,8 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
     }
 
     companion object {
-        const val MAX_FUEL_TICKS = 32000
-        const val TICKS_PER_BLOCK = 100
+        val MAX_FUEL_TICKS = Lifts.CONFIG.maxFuelTicksStored
+        val TICKS_PER_BLOCK = Lifts.CONFIG.fuelTicksNeededPerBlock
     }
 
 }

@@ -85,7 +85,7 @@ class LiftShaft private constructor(val key: RegistryKey<World>, val x: Int, val
 
         if(!state.isFullCube(world, frontPos) || state.block.hasBlockEntity()) {
             return cacheAndReturn(LiftActionResult.INVALID_PLATFORM, destination, simulation)
-        }else if(distance > lift.platformRange) {
+        }else if(distance > lift.liftConfig.platformRange) {
             return cacheAndReturn(LiftActionResult.NO_RANGE, destination, simulation)
         }
 
@@ -105,7 +105,7 @@ class LiftShaft private constructor(val key: RegistryKey<World>, val x: Int, val
             val platform = PlatformEntity(triple.second, triple.third, world)
             val spawnPos = triple.third
             platform.updatePosition(spawnPos.x + 0.5, spawnPos.y + 0.0, spawnPos.z + 0.5)
-            platform.speed = lift.platformSpeed
+            platform.speed = lift.liftConfig.platformSpeed
             platform.initialElevation = spawnPos.y + 0.0
             platform.finalElevation = destination.pos.y + 0.0
             if(world.spawnEntity(platform)) {

@@ -2,6 +2,7 @@ package io.github.lucaargolo.lifts.common.block.lift
 
 import io.github.lucaargolo.lifts.common.blockentity.lift.StirlingLiftBlockEntity
 import io.github.lucaargolo.lifts.common.containers.lift.StirlingLiftScreenHandler
+import io.github.lucaargolo.lifts.utils.ModConfig
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
 import net.minecraft.block.BlockState
 import net.minecraft.entity.player.PlayerEntity
@@ -17,7 +18,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.BlockView
 import net.minecraft.world.World
 
-class StirlingLift(settings: Settings, platformSpeed: Double, platformRange: Int): Lift(settings, platformSpeed, platformRange) {
+class StirlingLift(settings: Settings, liftConfig: ModConfig.LiftConfig): Lift(settings, liftConfig) {
 
     override fun createBlockEntity(world: BlockView?) = StirlingLiftBlockEntity()
 

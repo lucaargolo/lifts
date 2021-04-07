@@ -2,6 +2,7 @@ package io.github.lucaargolo.lifts.common.block.lift
 
 import io.github.lucaargolo.lifts.common.blockentity.lift.ElectricLiftBlockEntity
 import io.github.lucaargolo.lifts.common.containers.lift.ElectricLiftScreenHandler
+import io.github.lucaargolo.lifts.utils.ModConfig
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory
 import net.minecraft.block.BlockState
 import net.minecraft.entity.player.PlayerEntity
@@ -19,7 +20,7 @@ import net.minecraft.world.BlockView
 import net.minecraft.world.World
 import team.reborn.energy.EnergyTier
 
-class ElectricLift(settings: Settings, platformSpeed: Double, platformRange: Int, val energyCapacity: Double, val energyTier: EnergyTier): Lift(settings, platformSpeed, platformRange) {
+class ElectricLift(settings: Settings, val eletricLiftConfig: ModConfig.ElectricLiftConfig, val energyTier: EnergyTier): Lift(settings, eletricLiftConfig) {
 
     override fun createBlockEntity(world: BlockView?) = ElectricLiftBlockEntity()
 
