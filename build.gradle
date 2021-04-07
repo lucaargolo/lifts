@@ -20,6 +20,14 @@ repositories {
         name = "Modmuss50"
         url = "https://maven.modmuss50.me/"
     }
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/releases"
+    }
+    maven {
+        name "Shedaniel"
+        url "https://maven.shedaniel.me/"
+    }
     mavenLocal()
 }
 
@@ -34,7 +42,7 @@ dependencies {
     modApi "teamreborn:energy:${project.energy_version}"
     include "teamreborn:energy:${project.energy_version}"
 
-    modRuntime "io.github.prospector:modmenu:${project.modmenu_version}"
+    modRuntime "com.terraformersmc:modmenu:${project.modmenu_version}"
     modRuntime "me.shedaniel:RoughlyEnoughItems:${project.rei_version}"
 }
 
