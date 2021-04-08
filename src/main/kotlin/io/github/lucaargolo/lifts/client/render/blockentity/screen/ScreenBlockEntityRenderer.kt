@@ -8,6 +8,7 @@ import io.github.lucaargolo.lifts.client.screen.UnlinkedScreen
 import io.github.lucaargolo.lifts.common.block.screen.ScreenBlockHandler
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import io.github.lucaargolo.lifts.compat.OptifineShadersCompat
+import io.github.lucaargolo.lifts.utils.BackgroundRendererCache
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.*
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
@@ -55,8 +56,9 @@ class ScreenBlockEntityRenderer(dispatcher: BlockEntityRenderDispatcher): BlockE
         RenderSystem.loadIdentity()
         RenderSystem.translatef(0.0f, 0.0f, -2000.0f)
         RenderSystem.fogMode(GlStateManager.FogMode.EXP2)
+        RenderSystem.fogDensity(0f)
         entity.screen?.render(MatrixStack(), mousePos.first.toInt(), mousePos.second.toInt(), client.lastFrameDuration)
-        RenderSystem.fogMode(GlStateManager.FogMode.LINEAR)
+        BackgroundRendererCache.restoreCache()
         RenderSystem.matrixMode(5888)
         RenderSystem.popMatrix()
         RenderSystem.matrixMode(5889)

@@ -6,7 +6,8 @@
   "client": [
     "MinecraftClientMixin",
     "MouseMixin",
-    "KeyBindingAccessor"
+    "KeyBindingAccessor",
+    "BackgroundRendererMixin"
   ],
   "injectors": {
     "defaultRequire": 1

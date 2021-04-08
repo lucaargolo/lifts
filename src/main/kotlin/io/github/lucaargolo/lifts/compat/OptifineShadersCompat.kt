@@ -11,8 +11,10 @@ object OptifineShadersCompat {
     private var programsClass: Class<*>? = null
     private var programClass: Class<*>? = null
 
-    private var isRenderingDfbField: Field? = null
+    private var isRenderingWorldField: Field? = null
+    private var isShadowPassField: Field? = null
     private var dfbField: Field? = null
+    private var sfbField: Field? = null
     private var programsField: Field? = null
     private var activeProgramField: Field? = null
 
@@ -27,9 +29,12 @@ object OptifineShadersCompat {
             shadersFramebufferClass = Class.forName("net.optifine.shaders.ShadersFramebuffer")
             programsClass = Class.forName("net.optifine.shaders.Programs")
             programClass = Class.forName("net.optifine.shaders.Program")
-            isRenderingDfbField = shadersClass?.getField("isRenderingDfb")
+            isRenderingWorldField = shadersClass?.getField("isRenderingWorld")
+            isShadowPassField = shadersClass?.getField("isShadowPass")
             dfbField = shadersClass?.getDeclaredField("dfb")
             dfbField?.isAccessible = true
+            sfbField = shadersClass?.getDeclaredField("sfb")
+            sfbField?.isAccessible = true
             programsField = shadersClass?.getDeclaredField("programs")
             programsField?.isAccessible = true
             activeProgramField = shadersClass?.getField("activeProgram")
@@ -45,7 +50,7 @@ object OptifineShadersCompat {
     private var lastActiveProgram: Any? = null
 
     fun startDrawingScreen() {
-        if(isRenderingDfbField?.getBoolean(null) == true) {
+        if(isRenderingWorldField?.getBoolean(null) == true && isShadowPassField?.getBoolean(null) == false) {
             val programs = programsField?.get(null)
             lastActiveProgram = activeProgramField?.get(null)
             useProgramMethod?.invoke(null, getProgramNoneMethod?.invoke(programs))
@@ -53,10 +58,17 @@ object OptifineShadersCompat {
     }
 
     fun endDrawingScreen() {
-        if(isRenderingDfbField?.getBoolean(null) == true) {
-            val drawFramebuffer = dfbField?.get(null)
-            bindShadersFramebufferMethod?.invoke(drawFramebuffer)
-            useProgramMethod?.invoke(null, lastActiveProgram)
+        if(isRenderingWorldField?.getBoolean(null) == true) {
+            isShadowPassField?.getBoolean(null)?.let { isRenderingShadow ->
+                if(isRenderingShadow) {
+                    val shadowFramebuffer = sfbField?.get(null)
+                    bindShadersFramebufferMethod?.invoke(shadowFramebuffer)
+                }else{
+                    val drawFramebuffer = dfbField?.get(null)
+                    bindShadersFramebufferMethod?.invoke(drawFramebuffer)
+                    useProgramMethod?.invoke(null, lastActiveProgram)
+                }
+            }
         }
     }
 
