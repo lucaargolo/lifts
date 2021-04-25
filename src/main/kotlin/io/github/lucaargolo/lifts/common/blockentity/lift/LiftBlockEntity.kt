@@ -1,7 +1,7 @@
 package io.github.lucaargolo.lifts.common.blockentity.lift
 
-import io.github.lucaargolo.lifts.utils.SynchronizeableBlockEntity
 import io.github.lucaargolo.lifts.common.block.lift.Lift
+import io.github.lucaargolo.lifts.utils.SynchronizeableBlockEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks

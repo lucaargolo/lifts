@@ -1,7 +1,6 @@
 package io.github.lucaargolo.lifts.common.blockentity.screen
 
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
-import io.github.lucaargolo.lifts.common.blockentity.charger.ChargerBlockEntity
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
 import io.github.lucaargolo.lifts.utils.LinkActionResult
 import io.github.lucaargolo.lifts.utils.Linkable
@@ -12,7 +11,6 @@ import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
-import team.reborn.energy.EnergyHolder
 import team.reborn.energy.EnergySide
 import team.reborn.energy.EnergyStorage
 import team.reborn.energy.EnergyTier

@@ -10,7 +10,6 @@ import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import io.github.lucaargolo.lifts.utils.RegistryCompendium
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.util.registry.Registry
-import team.reborn.energy.EnergyTier
 
 @Suppress("UNCHECKED_CAST")
 object BlockEntityCompendium: RegistryCompendium<BlockEntityType<*>>(Registry.BLOCK_ENTITY_TYPE) {

@@ -1,7 +1,10 @@
 package io.github.lucaargolo.lifts.common.block.misc
 
 import io.github.lucaargolo.lifts.common.blockentity.misc.LiftDetectorBlockEntity
-import net.minecraft.block.*
+import net.minecraft.block.Block
+import net.minecraft.block.BlockRenderType
+import net.minecraft.block.BlockState
+import net.minecraft.block.BlockWithEntity
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.EnumProperty
 import net.minecraft.util.StringIdentifiable

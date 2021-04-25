@@ -3,7 +3,6 @@ package io.github.lucaargolo.lifts.mixin;
 import io.github.lucaargolo.lifts.common.block.screen.ScreenBlockHandler;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.RunArgs;
-import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.hit.HitResult;
 import org.jetbrains.annotations.Nullable;

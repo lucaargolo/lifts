@@ -4,15 +4,12 @@ import io.github.lucaargolo.lifts.common.containers.lift.ElectricLiftScreenHandl
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.HandledScreen
 import net.minecraft.client.gui.widget.ButtonWidget
-import net.minecraft.client.render.OverlayTexture
-import net.minecraft.client.render.VertexConsumerProvider.Immediate
-import net.minecraft.client.render.model.json.ModelTransformation
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.entity.player.PlayerInventory
-import net.minecraft.item.ItemStack
 import net.minecraft.text.LiteralText
 import net.minecraft.text.Text
 import net.minecraft.text.TranslatableText
+import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.MathHelper
 
@@ -31,8 +28,8 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
         super.render(matrices, mouseX, mouseY, delta)
         drawMouseoverTooltip(matrices, mouseX, mouseY)
         if((x+25..x+33).contains(mouseX) && (y+17..y+69).contains(mouseY)) {
-            val a = TranslatableText("screen.lifts.common.stored_energy").append(": ")
-            val b = LiteralText("${handler.energyStored}/${handler.entity.maxStoredPower} E")
+            val a = TranslatableText("screen.lifts.common.stored_energy").append(": ").formatted(Formatting.RED)
+            val b = LiteralText("%.0f/%.0f E".format(handler.energyStored, handler.entity.maxStoredPower)).formatted(Formatting.GRAY)
             renderTooltip(matrices, listOf(a, b), mouseX, mouseY)
         }
     }

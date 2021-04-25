@@ -10,7 +10,10 @@ import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import io.github.lucaargolo.lifts.compat.OptifineShadersCompat
 import io.github.lucaargolo.lifts.utils.BackgroundRendererCache
 import net.minecraft.client.MinecraftClient
-import net.minecraft.client.render.*
+import net.minecraft.client.render.BufferRenderer
+import net.minecraft.client.render.Tessellator
+import net.minecraft.client.render.VertexConsumerProvider
+import net.minecraft.client.render.VertexFormats
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
 import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.util.math.MatrixStack

@@ -4,10 +4,10 @@
   "package": "io.github.lucaargolo.lifts.mixin",
   "compatibilityLevel": "JAVA_8",
   "client": [
-    "MinecraftClientMixin",
-    "MouseMixin",
+    "BackgroundRendererMixin",
     "KeyBindingAccessor",
-    "BackgroundRendererMixin"
+    "MinecraftClientMixin",
+    "MouseMixin"
   ],
   "injectors": {
     "defaultRequire": 1

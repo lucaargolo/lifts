@@ -2,7 +2,6 @@ package io.github.lucaargolo.lifts.client.screen
 
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.text.LiteralText
 import net.minecraft.text.TranslatableText
 
 class NoEnergyScreen: Screen(TranslatableText("screen.lifts.title.no_energy")) {

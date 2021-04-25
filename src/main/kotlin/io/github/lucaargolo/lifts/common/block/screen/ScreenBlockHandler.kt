@@ -3,7 +3,6 @@ package io.github.lucaargolo.lifts.common.block.screen
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gl.Framebuffer
-import net.minecraft.client.gui.screen.Screen
 import net.minecraft.state.property.Properties
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult

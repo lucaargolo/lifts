@@ -3,7 +3,6 @@ package io.github.lucaargolo.lifts.common.item.linking
 import io.github.lucaargolo.lifts.utils.Linkable
 import net.minecraft.item.Item
 import net.minecraft.item.ItemUsageContext
-import net.minecraft.text.LiteralText
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.ActionResult
 import net.minecraft.util.Formatting

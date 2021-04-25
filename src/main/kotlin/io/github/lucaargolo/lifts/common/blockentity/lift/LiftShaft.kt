@@ -12,9 +12,6 @@ import net.minecraft.util.math.Vec3i
 import net.minecraft.util.registry.RegistryKey
 import net.minecraft.world.World
 import java.util.*
-import kotlin.Comparator
-import kotlin.collections.LinkedHashMap
-import kotlin.collections.LinkedHashSet
 
 class LiftShaft private constructor(val key: RegistryKey<World>, val x: Int, val z: Int) {
 

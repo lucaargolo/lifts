@@ -1,6 +1,5 @@
 package io.github.lucaargolo.lifts.common.entity.platform
 
-import io.github.lucaargolo.lifts.common.blockentity.lift.LiftShaft
 import io.github.lucaargolo.lifts.common.entity.EntityCompendium
 import io.github.lucaargolo.lifts.network.PacketCompendium
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs
@@ -8,13 +7,18 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
-import net.minecraft.entity.*
+import net.minecraft.entity.Entity
+import net.minecraft.entity.EntityType
+import net.minecraft.entity.MovementType
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.nbt.NbtHelper
 import net.minecraft.network.Packet
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.util.ItemScatterer
-import net.minecraft.util.math.*
+import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.Box
+import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.Vec3d
 import net.minecraft.world.World
 import kotlin.math.*
 

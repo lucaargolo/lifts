@@ -5,9 +5,9 @@ import com.google.gson.JsonParser
 import io.github.lucaargolo.lifts.common.block.BlockCompendium
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftShaft
+import io.github.lucaargolo.lifts.common.containers.ScreenHandlerCompendium
 import io.github.lucaargolo.lifts.common.entity.EntityCompendium
 import io.github.lucaargolo.lifts.common.item.ItemCompendium
-import io.github.lucaargolo.lifts.common.containers.ScreenHandlerCompendium
 import io.github.lucaargolo.lifts.network.PacketCompendium
 import io.github.lucaargolo.lifts.utils.ModConfig
 import io.github.lucaargolo.lifts.utils.ModIdentifier

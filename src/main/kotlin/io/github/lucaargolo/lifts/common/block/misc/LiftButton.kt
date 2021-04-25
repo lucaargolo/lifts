@@ -2,7 +2,9 @@ package io.github.lucaargolo.lifts.common.block.misc
 
 import io.github.lucaargolo.lifts.common.blockentity.misc.LiftButtonBlockEntity
 import io.github.lucaargolo.lifts.common.item.linking.LinkingTool
-import net.minecraft.block.*
+import net.minecraft.block.BlockEntityProvider
+import net.minecraft.block.BlockState
+import net.minecraft.block.StoneButtonBlock
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.ActionResult
