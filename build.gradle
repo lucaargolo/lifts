@@ -1,7 +1,34 @@
+buildscript {
+    dependencies {
+        classpath 'org.kohsuke:github-api:1.114'
+    }
+}
+
 plugins {
-    id 'fabric-loom'
     id 'maven-publish'
+    id 'fabric-loom'
+    id "org.ajoberstar.grgit"
     id "org.jetbrains.kotlin.jvm"
+    id "com.matthewprenger.cursegradle"
+    id "com.modrinth.minotaur"
+}
+
+def ENV = System.getenv()
+
+def getBranch() {
+    def ENV = System.getenv()
+
+    if (ENV.GITHUB_REF) {
+        def branch = ENV.GITHUB_REF
+        return branch.substring(branch.lastIndexOf("/") + 1)
+    }
+
+    if (grgit == null) {
+        return "unknown"
+    }
+
+    def branch = grgit.branch.current().name
+    return branch.substring(branch.lastIndexOf("/") + 1)
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
@@ -70,6 +97,75 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 
 jar {
     from "LICENSE"
+}
+
+//Github publishing
+import org.kohsuke.github.GHReleaseBuilder
+import org.kohsuke.github.GitHub
+
+task github(dependsOn: remapJar, group: "upload") {
+    onlyIf {
+        ENV.GITHUB_TOKEN
+    }
+
+    doLast {
+        def github = GitHub.connectUsingOAuth(ENV.GITHUB_TOKEN as String)
+        def repository = github.getRepository(ENV.GITHUB_REPOSITORY)
+
+        def releaseBuilder = new GHReleaseBuilder(repository, version as String)
+        releaseBuilder.name("Lifts ${version}")
+        releaseBuilder.body("A changelog can be found at https://github.com/lucaargolo/lifts/commits/")
+        releaseBuilder.commitish(getBranch())
+
+        def ghRelease = releaseBuilder.create()
+        ghRelease.uploadAsset(file("${buildDir}/libs/${archivesBaseName}-${version}.jar"), "application/java-archive");
+    }
+}
+
+//Curseforge publishing
+curseforge {
+    if (ENV.CURSEFORGE_API_KEY) {
+        apiKey = ENV.CURSEFORGE_API_KEY
+    }
+
+    project {
+        id = project.curseforge_id
+        changelog = "A changelog can be found at https://github.com/lucaargolo/lifts/commits/"
+        releaseType = "beta"
+        addGameVersion project.minecraft_version
+        addGameVersion "Fabric"
+
+        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
+            displayName = "Lifts ${version}"
+        }
+
+        afterEvaluate {
+            uploadTask.dependsOn("remapJar")
+        }
+    }
+
+    options {
+        forgeGradleIntegration = false
+    }
+}
+
+//Modrinth publishing
+import com.modrinth.minotaur.TaskModrinthUpload
+
+task modrinth(type: TaskModrinthUpload, dependsOn: remapJar, group: "upload") {
+    onlyIf {
+        ENV.MODRINTH_TOKEN
+    }
+    token = ENV.MODRINTH_TOKEN
+
+    projectId = project.modrinth_id
+    versionNumber = version
+    versionName = "Lifts ${version}"
+    releaseType = "beta"
+    uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+
+    addGameVersion(project.minecraft_version)
+    addLoader("fabric")
 }
 
 compileKotlin.kotlinOptions.jvmTarget = "1.8"
