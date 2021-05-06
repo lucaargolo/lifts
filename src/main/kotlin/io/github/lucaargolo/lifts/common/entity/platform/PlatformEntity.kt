@@ -40,6 +40,9 @@ class PlatformEntity: Entity {
         createBlockMatrix(pos1, pos2)
     }
 
+    override fun updateTrackedPositionAndAngles(x: Double, y: Double, z: Double, yaw: Float, pitch: Float, interpolationSteps: Int, interpolate: Boolean) {
+    }
+
     override fun updatePosition(x: Double, y: Double, z: Double) {
         setPos(x, y, z)
         this.boundingBox = Box(x - 0.5, y, z - 0.5, x + boundingBox.xLength - 0.5, y + boundingBox.yLength, z + boundingBox.zLength - 0.5)
@@ -55,6 +58,7 @@ class PlatformEntity: Entity {
             if(!newCollidingEntities.contains(it)) {
                 it.fallDistance = 0f
                 it.velocity = this.velocity
+                it.velocityDirty = true
             }
         }
         collidingEntities = newCollidingEntities
@@ -69,6 +73,7 @@ class PlatformEntity: Entity {
             move(MovementType.SELF, Vec3d(0.0, (vel+(d*0.1))*0.5, 0.0))
             val elevationOffset = pos.y - oldElevation
             collidingEntities?.forEach {
+                it.fallDistance = 0f
                 it.addVelocity(0.0, elevationOffset-it.velocity.y, 0.0)
             }
         }
