@@ -14,7 +14,9 @@ jobs:
     steps:
     - uses: actions/checkout@v2.2.0
     - uses: gradle/wrapper-validation-action@v1
-    - run: ./gradlew build github curseforge modrinth --stacktrace
+    - run: |
+        chmod +x ./gradlew
+        ./gradlew build github curseforge modrinth --stacktrace
       env:
         CURSEFORGE_API_KEY: ${{ secrets.CURSEFORGE_API_KEY }}
         GITHUB_TOKEN: ${{ secrets.GH_API_KEY }}
