@@ -14,7 +14,7 @@ group = project.maven_group
 repositories {
     maven {
         name = "Fabric"
-        url = "http://maven.fabricmc.net/"
+        url = "https://maven.fabricmc.net/"
     }
     maven {
         name = "Modmuss50"
@@ -64,7 +64,7 @@ tasks.withType(JavaCompile) {
 }
 
 task sourcesJar(type: Jar, dependsOn: classes) {
-    classifier = "sources"
+    archiveClassifier.set("sources")
     from sourceSets.main.allSource
 }
 

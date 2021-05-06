@@ -41,7 +41,7 @@ class LiftShaft private constructor(val key: RegistryKey<World>, val x: Int, val
     fun removeLift(lift: LiftBlockEntity): Boolean {
         simulationCache.clear()
         return if (blockEntitySet.remove(lift)) {
-            if(lift.isPlatformHere) platformedLifts.remove(lift)
+            platformedLifts.remove(lift)
             blockEntitySet.forEach {
                 if(it.world?.isClient == false) it.sync()
             }

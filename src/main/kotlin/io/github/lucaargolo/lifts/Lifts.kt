@@ -4,6 +4,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.JsonParser
 import io.github.lucaargolo.lifts.common.block.BlockCompendium
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
+import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftShaft
 import io.github.lucaargolo.lifts.common.containers.ScreenHandlerCompendium
 import io.github.lucaargolo.lifts.common.entity.EntityCompendium
@@ -13,6 +14,7 @@ import io.github.lucaargolo.lifts.utils.ModConfig
 import io.github.lucaargolo.lifts.utils.ModIdentifier
 import net.fabricmc.api.ModInitializer
 import net.fabricmc.fabric.api.client.itemgroup.FabricItemGroupBuilder
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents
 import net.fabricmc.loader.api.FabricLoader
@@ -39,6 +41,9 @@ class Lifts: ModInitializer {
         }
         ServerTickEvents.END_SERVER_TICK.register {
             LiftShaft.tickServer()
+        }
+        ServerBlockEntityEvents.BLOCK_ENTITY_UNLOAD.register { blockEntity, _ ->
+            (blockEntity as? LiftBlockEntity)?.let { it.liftShaft?.removeLift(it) }
         }
     }
 
