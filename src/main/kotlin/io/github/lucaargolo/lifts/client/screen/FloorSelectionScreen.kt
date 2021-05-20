@@ -44,7 +44,7 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
             }, { button, _, _, _ ->
                 tooltipBtnReference[button]?.let { LateTooltipHolder.scheduleLateTooltip(it, LateTooltipHolder.TooltipMode.RED) }
             })
-            this.addChild(btn)
+            this.method_37063(btn) //Add drawable
             if(btn.y + btn.height > 118) {
                 if(!scrollable) {
                     scrollable = true

@@ -21,7 +21,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
     override fun init() {
         super.init()
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2
-        this.addChild(ButtonWidget(x+43, y+50, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
+        this.method_37063(ButtonWidget(x+43, y+50, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) }) //Add drawable
     }
 
     override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {

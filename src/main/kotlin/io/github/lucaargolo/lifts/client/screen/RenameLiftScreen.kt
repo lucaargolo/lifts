@@ -22,7 +22,7 @@ class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(TranslatableTex
         nameField?.text = blockEntity.liftName ?: ""
         nameField?.setMaxLength(16)
         nameField?.setEditableColor(16777215)
-        this.addChild(nameField)
+        this.method_37063(nameField)
         setButton = ButtonWidget((width/2)-61, (height/2)+16, 122, 20, TranslatableText("screen.lifts.common.set_name")) {
             val passedData = PacketByteBufs.create()
             passedData.writeBlockPos(blockEntity.pos)
@@ -30,7 +30,7 @@ class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(TranslatableTex
             ClientPlayNetworking.send(PacketCompendium.RENAME_LIFT_ENTITY, passedData)
             onClose()
         }
-        this.addChild(setButton)
+        this.method_37063(setButton)
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {
@@ -45,7 +45,6 @@ class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(TranslatableTex
         super.render(matrices, mouseX, mouseY, delta)
         val text = TranslatableText("screen.lifts.message.write_name").append(": ")
         textRenderer.draw(matrices, text, (width/2f)-(textRenderer.getWidth(text)/2f), (height/2f)-20, 0xFFFFFF)
-        nameField?.render(matrices, mouseX, mouseY, delta)
     }
 
     override fun tick() {
