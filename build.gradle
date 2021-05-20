@@ -1,6 +1,6 @@
 buildscript {
     dependencies {
-        classpath 'org.kohsuke:github-api:1.114'
+        classpath "org.kohsuke:github-api:${project.github_api_version}"
     }
 }
 
@@ -13,8 +13,26 @@ plugins {
     id "com.modrinth.minotaur"
 }
 
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+compileKotlin.kotlinOptions.jvmTarget = "1.8"
+
+archivesBaseName = project.archives_base_name+"-"+project.minecraft_version
+version = project.mod_version
+group = project.maven_group
+
 def ENV = System.getenv()
 
+def RELEASE_NAME = "Lifts ${version}"
+def RELEASE_TYPE = version.split("-").size() > 0 ? (version.split("-")[1] == "BETA" || version.split("-")[1] == "ALPHA") ? version.split("-")[1] : "ALPHA" : "RELEASE"
+def RELEASE_FILE = "${buildDir}/libs/${archivesBaseName}-${version}.jar"
+
+@SuppressWarnings('GrMethodMayBeStatic')
+def getChangeLog() {
+    return "A changelog can be found at https://github.com/lucaargolo/lifts/commits/"
+}
+
+@SuppressWarnings('GrMethodMayBeStatic')
 def getBranch() {
     def ENV = System.getenv()
 
@@ -30,13 +48,6 @@ def getBranch() {
     def branch = grgit.branch.current().name
     return branch.substring(branch.lastIndexOf("/") + 1)
 }
-
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
-
-archivesBaseName = project.archives_base_name+"-"+project.minecraft_version
-version = project.mod_version
-group = project.maven_group
 
 repositories {
     maven {
@@ -113,12 +124,12 @@ task github(dependsOn: remapJar, group: "upload") {
         def repository = github.getRepository(ENV.GITHUB_REPOSITORY)
 
         def releaseBuilder = new GHReleaseBuilder(repository, version as String)
-        releaseBuilder.name("Lifts ${version}")
-        releaseBuilder.body("A changelog can be found at https://github.com/lucaargolo/lifts/commits/")
+        releaseBuilder.name(RELEASE_NAME)
+        releaseBuilder.body(getChangeLog())
         releaseBuilder.commitish(getBranch())
 
         def ghRelease = releaseBuilder.create()
-        ghRelease.uploadAsset(file("${buildDir}/libs/${archivesBaseName}-${version}.jar"), "application/java-archive");
+        ghRelease.uploadAsset(file(RELEASE_FILE), "application/java-archive")
     }
 }
 
@@ -130,13 +141,13 @@ curseforge {
 
     project {
         id = project.curseforge_id
-        changelog = "A changelog can be found at https://github.com/lucaargolo/lifts/commits/"
-        releaseType = "beta"
+        changelog = getChangeLog()
+        releaseType = RELEASE_TYPE.toLowerCase()
         addGameVersion project.minecraft_version
         addGameVersion "Fabric"
 
-        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")) {
-            displayName = "Lifts ${version}"
+        mainArtifact(file(RELEASE_FILE)) {
+            displayName = RELEASE_NAME
         }
 
         afterEvaluate {
@@ -151,6 +162,7 @@ curseforge {
 
 //Modrinth publishing
 import com.modrinth.minotaur.TaskModrinthUpload
+import com.modrinth.minotaur.request.VersionType
 
 task modrinth(type: TaskModrinthUpload, dependsOn: remapJar, group: "upload") {
     onlyIf {
@@ -159,13 +171,14 @@ task modrinth(type: TaskModrinthUpload, dependsOn: remapJar, group: "upload") {
     token = ENV.MODRINTH_TOKEN
 
     projectId = project.modrinth_id
-    versionNumber = version
-    versionName = "Lifts ${version}"
-    releaseType = "beta"
-    uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    changelog = getChangeLog()
 
-    addGameVersion(project.minecraft_version)
+    versionNumber = version
+    versionName = RELEASE_NAME
+    versionType = VersionType.valueOf(RELEASE_TYPE)
+
+    uploadFile = file(RELEASE_FILE)
+
+    addGameVersion(project.minecraft_version as String)
     addLoader("fabric")
 }
-
-compileKotlin.kotlinOptions.jvmTarget = "1.8"

@@ -3,7 +3,7 @@ name: Release
 on: [workflow_dispatch]
 
 jobs:
-  build:
+  release:
 
     runs-on: ubuntu-latest
 
@@ -13,7 +13,6 @@ jobs:
     
     steps:
     - uses: actions/checkout@v2.2.0
-    - uses: gradle/wrapper-validation-action@v1
     - run: |
         chmod +x ./gradlew
         ./gradlew build github curseforge modrinth --stacktrace
