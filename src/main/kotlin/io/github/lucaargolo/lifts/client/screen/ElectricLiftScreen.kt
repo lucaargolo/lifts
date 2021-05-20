@@ -1,5 +1,6 @@
 package io.github.lucaargolo.lifts.client.screen
 
+import com.mojang.blaze3d.systems.RenderSystem
 import io.github.lucaargolo.lifts.common.containers.lift.ElectricLiftScreenHandler
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.ingame.HandledScreen
@@ -20,7 +21,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
     override fun init() {
         super.init()
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2
-        this.addButton(ButtonWidget(x+43, y+50, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
+        this.addChild(ButtonWidget(x+43, y+50, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
     }
 
     override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
@@ -41,7 +42,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
     }
 
     override fun drawBackground(matrices: MatrixStack, delta: Float, mouseX: Int, mouseY: Int) {
-        client!!.textureManager.bindTexture(texture)
+        RenderSystem.setShaderTexture(0, texture)
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight)
         val energyPercentage = handler.energyStored/handler.entity.maxStoredPower
         val energyOffset = MathHelper.lerp(energyPercentage, 0.0, 52.0).toInt()

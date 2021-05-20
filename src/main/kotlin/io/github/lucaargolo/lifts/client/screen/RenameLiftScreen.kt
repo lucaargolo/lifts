@@ -30,7 +30,7 @@ class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(TranslatableTex
             ClientPlayNetworking.send(PacketCompendium.RENAME_LIFT_ENTITY, passedData)
             onClose()
         }
-        this.addButton(setButton)
+        this.addChild(setButton)
     }
 
     override fun keyPressed(keyCode: Int, scanCode: Int, modifiers: Int): Boolean {

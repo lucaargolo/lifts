@@ -1,16 +1,22 @@
 package io.github.lucaargolo.lifts.common.block.misc
 
+import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
+import io.github.lucaargolo.lifts.common.blockentity.lift.StirlingLiftBlockEntity
 import io.github.lucaargolo.lifts.common.blockentity.misc.LiftDetectorBlockEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockRenderType
 import net.minecraft.block.BlockState
 import net.minecraft.block.BlockWithEntity
+import net.minecraft.block.entity.BlockEntity
+import net.minecraft.block.entity.BlockEntityTicker
+import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.state.StateManager
 import net.minecraft.state.property.EnumProperty
 import net.minecraft.util.StringIdentifiable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockView
+import net.minecraft.world.World
 
 class LiftDetector(settings: Settings): BlockWithEntity(settings)  {
 
@@ -23,7 +29,11 @@ class LiftDetector(settings: Settings): BlockWithEntity(settings)  {
         builder.add(STATE)
     }
 
-    override fun createBlockEntity(world: BlockView?) = LiftDetectorBlockEntity()
+    override fun createBlockEntity(blockPos: BlockPos, blockState: BlockState) = LiftDetectorBlockEntity(blockPos, blockState)
+
+    override fun <T : BlockEntity?> getTicker(world: World?, state: BlockState?, type: BlockEntityType<T>?): BlockEntityTicker<T>? {
+        return checkType(type, BlockEntityCompendium.LIFT_DETECTOR_TYPE, LiftDetectorBlockEntity::commonTick)
+    }
 
     override fun getRenderType(state: BlockState?) = BlockRenderType.MODEL
 

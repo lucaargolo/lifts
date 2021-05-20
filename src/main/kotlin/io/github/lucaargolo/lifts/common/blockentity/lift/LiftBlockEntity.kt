@@ -6,15 +6,15 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
 import net.minecraft.state.property.Properties
 import net.minecraft.util.ItemScatterer
-import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
+import net.minecraft.world.World
 
-abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEntity(type), Tickable {
+abstract class LiftBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: BlockState): SynchronizeableBlockEntity(type, pos, state) {
 
     private var prevReachableLifts = 0
 
@@ -63,49 +63,51 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>): SynchronizeableBlockEn
     abstract fun preSendRequirements(distance: Int): LiftActionResult
     abstract fun postSendRequirements(distance: Int)
 
-    override fun tick() {
-        if(lift == null) {
-            lift = world?.getBlockState(pos)?.block as? Lift
-        }
-        if(liftShaft == null) {
-            liftShaft = world?.let { LiftShaft.getOrCreate(it, pos) }
-            if(liftShaft?.facing != null && facing != liftShaft?.facing)  {
-                (world as? ServerWorld)?.let { serverWorld ->
-                    val stacks = Block.getDroppedStacks(cachedState, serverWorld, pos, this)
-                    stacks.forEach {
-                        ItemScatterer.spawn(serverWorld, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it)
-                    }
-                }
-                world?.setBlockState(pos, Blocks.AIR.defaultState)
-                return
-            }
-            liftShaft?.addLift(this)
-        }
-        val world = world as? ServerWorld ?: return
-        if(world.isReceivingRedstonePower(pos)) {
-            if(ready && !isPlatformHere) {
-                val actionResult = liftShaft?.sendPlatformTo(world, this, false)
-                ready = actionResult?.isAccepted() ?: false
-            }
-        }else{
-            ready = true
-        }
-    }
-
-    override fun fromClientTag(tag: CompoundTag) {
+    override fun fromClientTag(tag: NbtCompound) {
         super.fromClientTag(tag)
         resetPlatformCache()
         liftShaft?.updateLift(this)
     }
 
-    override fun fromTag(state: BlockState?, tag: CompoundTag) {
-        super.fromTag(state, tag)
+    override fun readNbt(tag: NbtCompound) {
+        super.readNbt(tag)
         liftName = if(tag.contains("liftName")) tag.getString("liftName") else null
     }
 
-    override fun toTag(tag: CompoundTag): CompoundTag {
+    override fun writeNbt(tag: NbtCompound): NbtCompound {
         liftName?.let { tag.putString("liftName", it) }
-        return super.toTag(tag)
+        return super.writeNbt(tag)
+    }
+
+    companion object {
+        fun commonTick(world: World, pos: BlockPos, state: BlockState, entity: LiftBlockEntity) {
+            if(entity.lift == null) {
+                entity.lift = world.getBlockState(pos)?.block as? Lift
+            }
+            if(entity.liftShaft == null) {
+                entity.liftShaft = world.let { LiftShaft.getOrCreate(it, pos) }
+                if(entity.liftShaft?.facing != null && entity.facing != entity.liftShaft?.facing)  {
+                    (world as? ServerWorld)?.let { serverWorld ->
+                        val stacks = Block.getDroppedStacks(state, serverWorld, pos, entity)
+                        stacks.forEach {
+                            ItemScatterer.spawn(serverWorld, pos.x.toDouble(), pos.y.toDouble(), pos.z.toDouble(), it)
+                        }
+                    }
+                    world.setBlockState(pos, Blocks.AIR.defaultState)
+                    return
+                }
+                entity.liftShaft?.addLift(entity)
+            }
+            val serverWorld = world as? ServerWorld ?: return
+            if(serverWorld.isReceivingRedstonePower(pos)) {
+                if(entity.ready && !entity.isPlatformHere) {
+                    val actionResult = entity.liftShaft?.sendPlatformTo(serverWorld, entity, false)
+                    entity.ready = actionResult?.isAccepted() ?: false
+                }
+            }else{
+                entity.ready = true
+            }
+        }
     }
 
 }

@@ -44,7 +44,7 @@ class ElectricLiftScreenHandler(syncId: Int, private val playerInventory: Player
     }
 
     override fun canUse(player: PlayerEntity): Boolean {
-        return context.run({ world: World, blockPos: BlockPos ->
+        return context.get({ world: World, blockPos: BlockPos ->
             if (world.getBlockEntity(blockPos) != entity) false
             else player.squaredDistanceTo(
                 blockPos.x + .5,

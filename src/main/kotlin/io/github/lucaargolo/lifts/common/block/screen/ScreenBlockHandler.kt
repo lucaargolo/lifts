@@ -3,6 +3,7 @@ package io.github.lucaargolo.lifts.common.block.screen
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gl.Framebuffer
+import net.minecraft.client.gl.SimpleFramebuffer
 import net.minecraft.state.property.Properties
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.hit.HitResult
@@ -17,7 +18,7 @@ object ScreenBlockHandler {
     var screenFramebuffer: Framebuffer? = null
 
     fun setupFramebuffer(width: Int, height: Int) {
-        screenFramebuffer = Framebuffer(width, height, false, MinecraftClient.IS_SYSTEM_MAC)
+        screenFramebuffer = SimpleFramebuffer(width, height, false, MinecraftClient.IS_SYSTEM_MAC)
     }
 
     fun getFramebufferHeight(): Int {

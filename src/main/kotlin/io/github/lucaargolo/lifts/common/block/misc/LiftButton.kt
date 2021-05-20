@@ -1,10 +1,14 @@
 package io.github.lucaargolo.lifts.common.block.misc
 
+import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import io.github.lucaargolo.lifts.common.blockentity.misc.LiftButtonBlockEntity
 import io.github.lucaargolo.lifts.common.item.linking.LinkingTool
 import net.minecraft.block.BlockEntityProvider
 import net.minecraft.block.BlockState
 import net.minecraft.block.StoneButtonBlock
+import net.minecraft.block.entity.BlockEntity
+import net.minecraft.block.entity.BlockEntityTicker
+import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.text.TranslatableText
 import net.minecraft.util.ActionResult
@@ -18,7 +22,7 @@ import net.minecraft.world.World
 
 class LiftButton(settings: Settings): StoneButtonBlock(settings), BlockEntityProvider {
 
-    override fun createBlockEntity(world: BlockView?) = LiftButtonBlockEntity()
+    override fun createBlockEntity(blockPos: BlockPos, blockState: BlockState) = LiftButtonBlockEntity(blockPos, blockState)
 
     @Suppress("DEPRECATION")
     override fun onUse(state: BlockState, world: World, pos: BlockPos, player: PlayerEntity, hand: Hand, hit: BlockHitResult): ActionResult {
@@ -52,5 +56,11 @@ class LiftButton(settings: Settings): StoneButtonBlock(settings), BlockEntityPro
     override fun getStrongRedstonePower(state: BlockState, world: BlockView?, pos: BlockPos?, direction: Direction) = 0
 
     override fun emitsRedstonePower(state: BlockState?) = false
+
+    override fun <T : BlockEntity?> getTicker(world: World?, state: BlockState?, type: BlockEntityType<T>?): BlockEntityTicker<T>? {
+        return if(type != BlockEntityCompendium.LIFT_BUTTON_TYPE) null else BlockEntityTicker { wrld, poss, stat, blockEntity ->
+            LiftButtonBlockEntity.commonTick(wrld, poss, stat, blockEntity as LiftButtonBlockEntity)
+        }
+    }
 
 }

@@ -8,13 +8,14 @@ import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.entity.EntityRenderDispatcher
 import net.minecraft.client.render.entity.EntityRenderer
+import net.minecraft.client.render.entity.EntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.screen.PlayerScreenHandler
 import net.minecraft.util.Identifier
 import net.minecraft.util.math.BlockPos
 import java.util.*
 
-class PlatformEntityRenderer(dispatcher: EntityRenderDispatcher): EntityRenderer<PlatformEntity>(dispatcher) {
+class PlatformEntityRenderer(context: EntityRendererFactory.Context): EntityRenderer<PlatformEntity>(context) {
 
     override fun render(entity: PlatformEntity, yaw: Float, tickDelta: Float, matrices: MatrixStack, vertexConsumers: VertexConsumerProvider, light: Int) {
         entity.blockMatrix?.forEachIndexed { x, matrix ->

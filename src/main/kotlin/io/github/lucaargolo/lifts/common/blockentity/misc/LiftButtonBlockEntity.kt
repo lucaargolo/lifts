@@ -6,12 +6,12 @@ import io.github.lucaargolo.lifts.utils.LinkActionResult
 import io.github.lucaargolo.lifts.utils.Linkable
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.util.Tickable
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
+import net.minecraft.world.World
 
-class LiftButtonBlockEntity: BlockEntity(BlockEntityCompendium.LIFT_BUTTON_TYPE), Linkable, Tickable {
+class LiftButtonBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEntityCompendium.LIFT_BUTTON_TYPE, pos, state), Linkable {
 
     private var linkedPos: BlockPos? = null
     var linkedLift: LiftBlockEntity? = null
@@ -28,20 +28,13 @@ class LiftButtonBlockEntity: BlockEntity(BlockEntityCompendium.LIFT_BUTTON_TYPE)
         } ?: LinkActionResult.NOT_LIFT
     }
 
-    override fun tick() {
-        linkedPos?.let {
-            linkedLift = world?.getBlockEntity(linkedPos) as? LiftBlockEntity
-            linkedPos = null
-        }
-    }
-
-    override fun toTag(tag: CompoundTag): CompoundTag {
+    override fun writeNbt(tag: NbtCompound): NbtCompound {
         linkedLift?.let { tag.putLong("linkedLift", it.pos.asLong()) }
-        return super.toTag(tag)
+        return super.writeNbt(tag)
     }
 
-    override fun fromTag(blockState: BlockState, tag: CompoundTag) {
-        super.fromTag(blockState, tag)
+    override fun readNbt(tag: NbtCompound) {
+        super.readNbt(tag)
         linkedPos = if(tag.contains("linkedLift")) {
             BlockPos.fromLong(tag.getLong("linkedLift"))
         } else { null }
@@ -49,5 +42,12 @@ class LiftButtonBlockEntity: BlockEntity(BlockEntityCompendium.LIFT_BUTTON_TYPE)
 
     companion object {
         const val MAX_LIFT_DISTANCE = 16
+
+        fun commonTick(world: World, pos: BlockPos, state: BlockState, entity: LiftButtonBlockEntity) {
+            entity.linkedPos?.let {
+                entity.linkedLift = world.getBlockEntity(entity.linkedPos) as? LiftBlockEntity
+                entity.linkedPos = null
+            }
+        }
     }
 }

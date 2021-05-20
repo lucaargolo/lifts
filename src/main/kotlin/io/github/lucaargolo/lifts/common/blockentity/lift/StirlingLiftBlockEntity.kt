@@ -8,13 +8,15 @@ import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.inventory.Inventories
 import net.minecraft.inventory.SidedInventory
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.screen.PropertyDelegate
 import net.minecraft.util.collection.DefaultedList
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.Direction
 import net.minecraft.util.math.MathHelper
+import net.minecraft.world.World
 
-class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LIFT_TYPE), SidedInventory {
+class StirlingLiftBlockEntity(pos: BlockPos, state: BlockState): LiftBlockEntity(BlockEntityCompendium.STIRLING_LIFT_TYPE, pos, state), SidedInventory {
 
     private var inventory = DefaultedList.ofSize(1, ItemStack.EMPTY)
     private var burningTime = 0
@@ -69,30 +71,6 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
         return x
     }
 
-
-    override fun tick() {
-        if(burningTicks == 0) {
-            if(storedTicks < MAX_FUEL_TICKS) {
-                burningTime = getFuelTime(inventory[0])
-                if(burningTime > 0) {
-                    inventory[0].decrement(1)
-                    burningTicks += burningTime
-                }
-                markDirty()
-            }
-        }else{
-            if(storedTicks < MAX_FUEL_TICKS) {
-                storedTicks++
-                burningTicks--
-                if(burningTicks == 0) {
-                    burningTime = 0
-                }
-                markDirty()
-            }
-        }
-        super.tick()
-    }
-
     private fun getFuelTime(fuel: ItemStack): Int {
         return if(fuel.isEmpty) 0 else FuelRegistry.INSTANCE.get(fuel.item) ?: 0
     }
@@ -116,23 +94,46 @@ class StirlingLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.STIRLING_LI
         }
     }
 
-    override fun fromTag(state: BlockState?, tag: CompoundTag) {
-        Inventories.fromTag(tag, inventory)
+    override fun readNbt(tag: NbtCompound) {
+        Inventories.readNbt(tag, inventory)
         storedTicks = tag.getInt("storedTicks")
         burningTicks = tag.getInt("burningTicks")
-        super.fromTag(state, tag)
+        super.readNbt(tag)
     }
 
-    override fun toTag(tag: CompoundTag): CompoundTag {
-        Inventories.toTag(tag, inventory)
+    override fun writeNbt(tag: NbtCompound): NbtCompound {
+        Inventories.writeNbt(tag, inventory)
         tag.putInt("storedTicks", storedTicks)
         tag.putInt("burningTicks", burningTicks)
-        return super.toTag(tag)
+        return super.writeNbt(tag)
     }
 
     companion object {
         val MAX_FUEL_TICKS = Lifts.CONFIG.maxFuelTicksStored
         val TICKS_PER_BLOCK = Lifts.CONFIG.fuelTicksNeededPerBlock
+
+        fun commonTick(world: World, pos: BlockPos, state: BlockState, entity: StirlingLiftBlockEntity) {
+            if(entity.burningTicks == 0) {
+                if(entity.storedTicks < MAX_FUEL_TICKS) {
+                    entity.burningTime = entity.getFuelTime(entity.inventory[0])
+                    if(entity.burningTime > 0) {
+                        entity.inventory[0].decrement(1)
+                        entity.burningTicks += entity.burningTime
+                    }
+                    entity.markDirty()
+                }
+            }else{
+                if(entity.storedTicks < MAX_FUEL_TICKS) {
+                    entity.storedTicks++
+                    entity.burningTicks--
+                    if(entity.burningTicks == 0) {
+                        entity.burningTime = 0
+                    }
+                    entity.markDirty()
+                }
+            }
+            LiftBlockEntity.commonTick(world, pos, state, entity)
+        }
     }
 
 }

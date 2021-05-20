@@ -30,7 +30,7 @@ object PacketCompendium {
             val pitch = buf.readByte()
             val yaw = buf.readByte()
 
-            val tag = buf.readCompoundTag()
+            val tag = buf.readNbt()
             val finalElevation = buf.readDouble()
             val speed = buf.readDouble()
 
@@ -43,7 +43,7 @@ object PacketCompendium {
 
                 entity.pitch = pitch * 360 / 256.0f
                 entity.yaw = yaw * 360 / 256.0f
-                entity.entityId = id
+                entity.setEntityId(id)
                 entity.uuid = uuid
 
                 tag?.let { entity.readBlockMatrixFromTag(tag) }

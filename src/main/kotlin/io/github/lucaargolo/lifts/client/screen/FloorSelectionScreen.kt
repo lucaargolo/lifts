@@ -27,8 +27,7 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
     private var excessHeight = 0.0
 
     override fun init() {
-        this.children.clear()
-        this.buttons.clear()
+        children().clear()
         buttonLiftReference.clear()
         heightBtnReference.clear()
         tooltipBtnReference.clear()
@@ -45,12 +44,12 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
             }, { button, _, _, _ ->
                 tooltipBtnReference[button]?.let { LateTooltipHolder.scheduleLateTooltip(it, LateTooltipHolder.TooltipMode.RED) }
             })
-            this.addButton(btn)
+            this.addChild(btn)
             if(btn.y + btn.height > 118) {
                 if(!scrollable) {
                     scrollable = true
-                    this.buttons.forEach {
-                        it.width = 100
+                    children().forEach {
+                        (it as? ButtonWidget)?.width = 100
                     }
                     excessHeight += (btn.y + btn.height) - 118
                 }else{
@@ -84,9 +83,11 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
 
     override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
         if(scrollable) {
-            buttons.forEach { btn ->
-                if((-20..120).contains(btn.y)) {
-                    btn.render(matrices, mouseX, mouseY, delta)
+            children().forEach {
+                (it as? ButtonWidget)?.let { btn ->
+                    if((-20..120).contains(btn.y)) {
+                        btn.render(matrices, mouseX, mouseY, delta)
+                    }
                 }
             }
             client?.textureManager?.bindTexture(scrollTexture)
@@ -103,8 +104,8 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
     }
 
     override fun tick() {
-        if(this.buttons.size != blockEntity.liftShaft?.size ?: 0) {
-            this.init()
+        if(children().filterIsInstance(ButtonWidget::class.java).size != blockEntity.liftShaft?.size ?: 0) {
+            init()
         }
         var index = 0
         buttonLiftReference.forEach { (lift, btn) ->
@@ -126,8 +127,8 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
     }
 
     private fun updateButtonsHeight() {
-        this.buttons.forEach {
-            it.y = (heightBtnReference[it] ?: 0) - scrollableOffset.toInt()
+        children().forEach {
+            (it as? ButtonWidget)?.y = (heightBtnReference[it] ?: 0) - scrollableOffset.toInt()
         }
     }
 

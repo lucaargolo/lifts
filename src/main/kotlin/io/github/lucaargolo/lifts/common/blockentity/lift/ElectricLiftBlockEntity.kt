@@ -4,13 +4,15 @@ import io.github.lucaargolo.lifts.Lifts
 import io.github.lucaargolo.lifts.common.block.lift.ElectricLift
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import net.minecraft.block.BlockState
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
+import net.minecraft.world.World
 import team.reborn.energy.EnergySide
 import team.reborn.energy.EnergyStorage
 import team.reborn.energy.EnergyTier
 
-class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LIFT_TYPE), EnergyStorage {
+class ElectricLiftBlockEntity(pos: BlockPos, state: BlockState): LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LIFT_TYPE, pos, state), EnergyStorage {
 
     private var initializedEnergy = false
     private var energyTier = EnergyTier.INSANE
@@ -45,17 +47,6 @@ class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LI
         return x
     }
 
-    override fun tick() {
-        super.tick()
-        if(!initializedEnergy) {
-            (lift as? ElectricLift)?.let {
-                energyTier = it.energyTier
-                energyCapacity = it.electricLiftConfig.energyCapacity
-                initializedEnergy = true
-            }
-        }
-    }
-
     override fun preSendRequirements(distance: Int): LiftActionResult {
         val cost = ENERGY_PER_BLOCK * distance
         return if(energyStored - cost >= 0) LiftActionResult.SUCCESSFUL else LiftActionResult.NO_ENERGY
@@ -67,18 +58,29 @@ class ElectricLiftBlockEntity: LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LI
         markDirty()
     }
 
-    override fun fromTag(state: BlockState?, tag: CompoundTag) {
-        super.fromTag(state, tag)
+    override fun readNbt(tag: NbtCompound) {
+        super.readNbt(tag)
         energyStored = tag.getDouble("energyStored")
     }
 
-    override fun toTag(tag: CompoundTag): CompoundTag {
+    override fun writeNbt(tag: NbtCompound): NbtCompound {
         tag.putDouble("energyStored", energyStored)
-        return super.toTag(tag)
+        return super.writeNbt(tag)
     }
 
     companion object {
         val ENERGY_PER_BLOCK = Lifts.CONFIG.energyUnitsNeededPerBlock
+
+        fun commonTick(world: World, pos: BlockPos, state: BlockState, entity: ElectricLiftBlockEntity) {
+            LiftBlockEntity.commonTick(world, pos, state, entity)
+            if(!entity.initializedEnergy) {
+                (entity.lift as? ElectricLift)?.let {
+                    entity.energyTier = it.energyTier
+                    entity.energyCapacity = it.electricLiftConfig.energyCapacity
+                    entity.initializedEnergy = true
+                }
+            }
+        }
     }
 
 }

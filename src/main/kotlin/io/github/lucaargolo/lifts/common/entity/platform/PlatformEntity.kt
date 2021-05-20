@@ -10,7 +10,7 @@ import net.minecraft.block.Blocks
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityType
 import net.minecraft.entity.MovementType
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.nbt.NbtHelper
 import net.minecraft.network.Packet
 import net.minecraft.server.world.ServerWorld
@@ -43,17 +43,12 @@ class PlatformEntity: Entity {
     override fun updateTrackedPositionAndAngles(x: Double, y: Double, z: Double, yaw: Float, pitch: Float, interpolationSteps: Int, interpolate: Boolean) {
     }
 
-    override fun updatePosition(x: Double, y: Double, z: Double) {
-        setPos(x, y, z)
-        this.boundingBox = Box(x - 0.5, y, z - 0.5, x + boundingBox.xLength - 0.5, y + boundingBox.yLength, z + boundingBox.zLength - 0.5)
-    }
-
     fun easeInOutSine(x: Double): Double {
         return -(cos(PI * x) - 1) / 2
     }
 
     override fun tick() {
-        val newCollidingEntities = this.world.getEntitiesByType<Entity>(null, this.boundingBox.expand(0.0, 0.3, 0.0)) {it !is PlatformEntity}
+        val newCollidingEntities = this.world.getOtherEntities(null, this.boundingBox.expand(0.0, 0.3, 0.0)) {it !is PlatformEntity}
         collidingEntities?.forEach {
             if(!newCollidingEntities.contains(it)) {
                 it.fallDistance = 0f
@@ -118,7 +113,7 @@ class PlatformEntity: Entity {
                 }
             }
         }
-        remove()
+        remove(RemovalReason.DISCARDED)
         return yPos
     }
 
@@ -136,7 +131,7 @@ class PlatformEntity: Entity {
             for(z in (minZ..maxZ)) {
                 val pos = BlockPos(x, y, z)
                 val state = world.getBlockState(pos)
-                matrixRow[z - minZ] = if(state.isFullCube(world, pos) && !state.block.hasBlockEntity()) {
+                matrixRow[z - minZ] = if(state.isFullCube(world, pos) && !state.hasBlockEntity()) {
                     world.setBlockState(pos, Blocks.AIR.defaultState)
                     state
                 }else{
@@ -162,13 +157,13 @@ class PlatformEntity: Entity {
 
     override fun calculateDimensions() { }
 
-    override fun initDataTracker() { }
-
-    override fun moveToBoundingBoxCenter() {
-        setPos(x, boundingBox.minY, z)
+    override fun calculateBoundingBox(): Box {
+        return Box(x - 0.5, y, z - 0.5, x + boundingBox.xLength - 0.5, y + boundingBox.yLength, z + boundingBox.zLength - 0.5)
     }
 
-    fun writeBlockMatrixToTag(tag: CompoundTag) {
+    override fun initDataTracker() { }
+
+    fun writeBlockMatrixToTag(tag: NbtCompound) {
         tag.putInt("xSize", blockMatrix?.size ?: 0)
         tag.putInt("ySize", blockMatrix?.getOrNull(0)?.size ?: 0)
         blockMatrix?.forEachIndexed { x, row ->
@@ -178,11 +173,11 @@ class PlatformEntity: Entity {
         }
     }
 
-    override fun writeCustomDataToTag(tag: CompoundTag) {
+    override fun writeCustomDataToNbt(tag: NbtCompound) {
         writeBlockMatrixToTag(tag)
     }
 
-    fun readBlockMatrixFromTag(tag: CompoundTag) {
+    fun readBlockMatrixFromTag(tag: NbtCompound) {
         var x = 0
         var z = 0
         val blockMatrix = arrayOfNulls<Array<BlockState?>>(tag.getInt("xSize"))
@@ -202,13 +197,13 @@ class PlatformEntity: Entity {
         createBoundingBox()
     }
 
-    override fun readCustomDataFromTag(tag: CompoundTag) {
+    override fun readCustomDataFromNbt(tag: NbtCompound) {
         readBlockMatrixFromTag(tag)
     }
 
     override fun createSpawnPacket(): Packet<*> {
         val buf = PacketByteBufs.create()
-        buf.writeVarInt(entityId)
+        buf.writeVarInt(id)
         buf.writeUuid(uuid)
         buf.writeDouble(x)
         buf.writeDouble(y)
@@ -216,9 +211,9 @@ class PlatformEntity: Entity {
         buf.writeByte(MathHelper.floor(pitch * 256.0f / 360.0f))
         buf.writeByte(MathHelper.floor(yaw * 256.0f / 360.0f))
 
-        val tag = CompoundTag()
+        val tag = NbtCompound()
         writeBlockMatrixToTag(tag)
-        buf.writeCompoundTag(tag)
+        buf.writeNbt(tag)
 
         buf.writeDouble(finalElevation)
         buf.writeDouble(speed)

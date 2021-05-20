@@ -1,8 +1,12 @@
 package io.github.lucaargolo.lifts.common.block.screen
 
+import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import io.github.lucaargolo.lifts.common.item.linking.LinkingTool
 import net.minecraft.block.*
+import net.minecraft.block.entity.BlockEntity
+import net.minecraft.block.entity.BlockEntityTicker
+import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.ItemPlacementContext
 import net.minecraft.state.StateManager
@@ -18,7 +22,11 @@ import net.minecraft.world.World
 
 class ScreenBlock(settings: Settings): BlockWithEntity(settings) {
 
-    override fun createBlockEntity(world: BlockView?) = ScreenBlockEntity()
+    override fun createBlockEntity(blockPos: BlockPos, blockState: BlockState) = ScreenBlockEntity(blockPos, blockState)
+
+    override fun <T : BlockEntity?> getTicker(world: World?, state: BlockState?, type: BlockEntityType<T>?): BlockEntityTicker<T>? {
+        return checkType(type, BlockEntityCompendium.SCREEN_TYPE, ScreenBlockEntity::commonTick)
+    }
 
     override fun appendProperties(builder: StateManager.Builder<Block, BlockState>) {
         builder.add(Properties.HORIZONTAL_FACING)

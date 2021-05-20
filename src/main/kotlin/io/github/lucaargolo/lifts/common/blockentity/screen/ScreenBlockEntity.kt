@@ -7,15 +7,15 @@ import io.github.lucaargolo.lifts.utils.Linkable
 import io.github.lucaargolo.lifts.utils.SynchronizeableBlockEntity
 import net.minecraft.block.BlockState
 import net.minecraft.client.gui.screen.Screen
-import net.minecraft.nbt.CompoundTag
-import net.minecraft.util.Tickable
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
+import net.minecraft.world.World
 import team.reborn.energy.EnergySide
 import team.reborn.energy.EnergyStorage
 import team.reborn.energy.EnergyTier
 
-class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN_TYPE), Linkable, Tickable, EnergyStorage {
+class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN_TYPE, pos, state), Linkable, EnergyStorage {
 
     enum class State {
         NO_ENERGY,
@@ -53,54 +53,16 @@ class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN
     var clickDelay = 0
     var tickDelay = 0
 
-    override fun tick() {
-        linkedPos?.let {
-            linkedLift = world?.getBlockEntity(linkedPos) as? LiftBlockEntity
-            linkedPos = null
-        }
-        if(clickDelay > 0) {
-            clickDelay--
-        }
-        screen?.tick()
-        if(world?.isClient == true) return
-        if(tickDelay > 20) {
-            when(state) {
-                State.NO_ENERGY -> if(storedEnergy >= 100.0) state = State.LINKED
-                State.UNLINKED, State.LINKED -> {
-                    if(storedEnergy < 100.0) {
-                        state = State.NO_ENERGY
-                    }else{
-                        storedEnergy--
-                    }
-                    if(state == State.UNLINKED && linkedLift != null) {
-                        state = State.LINKED
-                    }else if(state == State.LINKED && (linkedLift == null || linkedLift?.isRemoved == true)) {
-                        linkedLift = null
-                        state = State.UNLINKED
-                    }
-                }
-            }
-            markDirty()
-            tickDelay = 0
-        }else{
-            tickDelay++
-            if(state != State.NO_ENERGY && storedEnergy > 0.0) {
-                storedEnergy--
-                markDirty()
-            }
-        }
-    }
-
-    override fun toTag(tag: CompoundTag): CompoundTag {
+    override fun writeNbt(tag: NbtCompound): NbtCompound {
         tag.putDouble("storedEnergy", storedEnergy)
         linkedLift?.let { tag.putLong("linkedLift", it.pos.asLong()) }
         linkedPos?.let { tag.putLong("linkedLift", it.asLong()) }
         tag.putString("state", state.name)
-        return super.toTag(tag)
+        return super.writeNbt(tag)
     }
 
-    override fun fromTag(blockState: BlockState, tag: CompoundTag) {
-        super.fromTag(blockState, tag)
+    override fun readNbt(tag: NbtCompound) {
+        super.readNbt(tag)
         storedEnergy = tag.getDouble("storedEnergy")
         linkedPos = if(tag.contains("linkedLift")) {
             BlockPos.fromLong(tag.getLong("linkedLift"))
@@ -127,6 +89,44 @@ class ScreenBlockEntity: SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN
 
     companion object {
         const val MAX_LIFT_DISTANCE = 32
+
+        fun commonTick(world: World, pos: BlockPos, state: BlockState, entity: ScreenBlockEntity) {
+            entity.linkedPos?.let {
+                entity.linkedLift = world.getBlockEntity(entity.linkedPos) as? LiftBlockEntity
+                entity.linkedPos = null
+            }
+            if(entity.clickDelay > 0) {
+                entity.clickDelay--
+            }
+            entity.screen?.tick()
+            if(world.isClient) return
+            if(entity.tickDelay > 20) {
+                when(entity.state) {
+                    State.NO_ENERGY -> if(entity.storedEnergy >= 100.0) entity.state = State.LINKED
+                    State.UNLINKED, State.LINKED -> {
+                        if(entity.storedEnergy < 100.0) {
+                            entity.state = State.NO_ENERGY
+                        }else{
+                            entity.storedEnergy--
+                        }
+                        if(entity.state == State.UNLINKED && entity.linkedLift != null) {
+                            entity.state = State.LINKED
+                        }else if(entity.state == State.LINKED && (entity.linkedLift == null || entity.linkedLift?.isRemoved == true)) {
+                            entity.linkedLift = null
+                            entity.state = State.UNLINKED
+                        }
+                    }
+                }
+                entity.markDirty()
+                entity.tickDelay = 0
+            }else{
+                entity.tickDelay++
+                if(entity.state != State.NO_ENERGY && entity.storedEnergy > 0.0) {
+                    entity.storedEnergy--
+                    entity.markDirty()
+                }
+            }
+        }
     }
 
 }

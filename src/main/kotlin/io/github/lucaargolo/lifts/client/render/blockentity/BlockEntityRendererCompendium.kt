@@ -17,7 +17,7 @@ object BlockEntityRendererCompendium: GenericCompendium<Function<BlockEntityRend
     @Suppress("UNCHECKED_CAST")
     override fun initialize() {
         map.forEach { (entityIdentifier, renderFactory) ->
-            BlockEntityRendererRegistry.INSTANCE.register(BlockEntityCompendium.get(entityIdentifier) as BlockEntityType<BlockEntity>, renderFactory as Function<BlockEntityRenderDispatcher, BlockEntityRenderer<BlockEntity>>)
+            BlockEntityRendererRegistry.INSTANCE.register(BlockEntityCompendium.get(entityIdentifier) as BlockEntityType<BlockEntity>) {context -> renderFactory.apply(context.renderDispatcher) as BlockEntityRenderer<BlockEntity>}
         }
     }
 

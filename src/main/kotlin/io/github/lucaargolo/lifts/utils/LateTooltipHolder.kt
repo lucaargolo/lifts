@@ -6,6 +6,7 @@ import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawableHelper
 import net.minecraft.client.render.BufferRenderer
 import net.minecraft.client.render.Tessellator
+import net.minecraft.client.render.VertexFormat
 import net.minecraft.client.render.VertexFormats
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.OrderedText
@@ -58,7 +59,7 @@ object LateTooltipHolder: DrawableHelper() {
 
             val tessellator = Tessellator.getInstance()
             val bufferBuilder = tessellator.buffer
-            bufferBuilder.begin(7, VertexFormats.POSITION_COLOR)
+            bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR)
             val matrix4f = matrices.peek().model
             val z = 0
 

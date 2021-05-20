@@ -7,13 +7,13 @@ import io.github.lucaargolo.lifts.utils.LinkActionResult
 import io.github.lucaargolo.lifts.utils.Linkable
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
-import net.minecraft.nbt.CompoundTag
+import net.minecraft.nbt.NbtCompound
 import net.minecraft.server.world.ServerWorld
-import net.minecraft.util.Tickable
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
+import net.minecraft.world.World
 
-class LiftDetectorBlockEntity: BlockEntity(BlockEntityCompendium.LIFT_DETECTOR_TYPE), Linkable, Tickable {
+class LiftDetectorBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEntityCompendium.LIFT_DETECTOR_TYPE, pos, state), Linkable {
 
     private var linkedPos: BlockPos? = null
     private var linkedLift: LiftBlockEntity? = null
@@ -30,39 +30,13 @@ class LiftDetectorBlockEntity: BlockEntity(BlockEntityCompendium.LIFT_DETECTOR_T
         } ?: LinkActionResult.NOT_LIFT
     }
 
-    override fun tick() {
-        linkedPos?.let {
-            linkedLift = world?.getBlockEntity(linkedPos) as? LiftBlockEntity
-            linkedPos = null
-        }
-        val world = world as? ServerWorld ?: return
-        val state = cachedState
-        when(state[LiftDetector.STATE]) {
-            LiftDetector.State.NOT_LINKED -> {
-                linkedLift?.let {
-                    world.setBlockState(pos, state.with(LiftDetector.STATE, LiftDetector.State.NOT_HERE))
-                }
-            }
-            else -> {
-                if(linkedLift == null || linkedLift?.isRemoved == true) {
-                    linkedLift = null
-                    world.setBlockState(pos, state.with(LiftDetector.STATE, LiftDetector.State.NOT_LINKED))
-                }else if(state[LiftDetector.STATE] == LiftDetector.State.NOT_HERE && linkedLift?.isPlatformHere == true) {
-                    world.setBlockState(pos, state.with(LiftDetector.STATE, LiftDetector.State.HERE))
-                }else if(state[LiftDetector.STATE] == LiftDetector.State.HERE && linkedLift?.isPlatformHere == false) {
-                    world.setBlockState(pos, state.with(LiftDetector.STATE, LiftDetector.State.NOT_HERE))
-                }
-            }
-        }
-    }
-
-    override fun toTag(tag: CompoundTag): CompoundTag {
+    override fun writeNbt(tag: NbtCompound): NbtCompound {
         linkedLift?.let { tag.putLong("linkedLift", it.pos.asLong()) }
-        return super.toTag(tag)
+        return super.writeNbt(tag)
     }
 
-    override fun fromTag(blockState: BlockState, tag: CompoundTag) {
-        super.fromTag(blockState, tag)
+    override fun readNbt(tag: NbtCompound) {
+        super.readNbt(tag)
         linkedPos = if(tag.contains("linkedLift")) {
             BlockPos.fromLong(tag.getLong("linkedLift"))
         } else { null }
@@ -70,6 +44,32 @@ class LiftDetectorBlockEntity: BlockEntity(BlockEntityCompendium.LIFT_DETECTOR_T
 
     companion object {
         const val MAX_LIFT_DISTANCE = 16
+
+        fun commonTick(world: World, pos: BlockPos, state: BlockState, entity: LiftDetectorBlockEntity) {
+            entity.linkedPos?.let {
+                entity.linkedLift = world.getBlockEntity(entity.linkedPos) as? LiftBlockEntity
+                entity.linkedPos = null
+            }
+            val serverWorld = world as? ServerWorld ?: return
+            when(state[LiftDetector.STATE]) {
+                LiftDetector.State.NOT_LINKED -> {
+                    entity.linkedLift?.let {
+                        serverWorld.setBlockState(pos, state.with(LiftDetector.STATE, LiftDetector.State.NOT_HERE))
+                    }
+                }
+                else -> {
+                    if(entity.linkedLift == null || entity.linkedLift?.isRemoved == true) {
+                        entity.linkedLift = null
+                        serverWorld.setBlockState(pos, state.with(LiftDetector.STATE, LiftDetector.State.NOT_LINKED))
+                    }else if(state[LiftDetector.STATE] == LiftDetector.State.NOT_HERE && entity.linkedLift?.isPlatformHere == true) {
+                        serverWorld.setBlockState(pos, state.with(LiftDetector.STATE, LiftDetector.State.HERE))
+                    }else if(state[LiftDetector.STATE] == LiftDetector.State.HERE && entity.linkedLift?.isPlatformHere == false) {
+                        serverWorld.setBlockState(pos, state.with(LiftDetector.STATE, LiftDetector.State.NOT_HERE))
+                    }
+                }
+            }
+        }
+
     }
 
 
