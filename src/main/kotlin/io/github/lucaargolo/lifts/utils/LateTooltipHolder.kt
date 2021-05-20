@@ -4,10 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.DrawableHelper
-import net.minecraft.client.render.BufferRenderer
-import net.minecraft.client.render.Tessellator
-import net.minecraft.client.render.VertexFormat
-import net.minecraft.client.render.VertexFormats
+import net.minecraft.client.render.*
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.OrderedText
 import net.minecraft.text.Text
@@ -56,6 +53,8 @@ object LateTooltipHolder: DrawableHelper() {
 
             matrices.push()
             matrices.translate(30.0, 30.0, 0.0)
+
+            RenderSystem.setShader(GameRenderer::getPositionColorShader)
 
             val tessellator = Tessellator.getInstance()
             val bufferBuilder = tessellator.buffer
