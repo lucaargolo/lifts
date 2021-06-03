@@ -18,7 +18,7 @@ class LiftButtonBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(Block
 
     override fun link(blockPos: BlockPos): LinkActionResult{
         return (world?.getBlockEntity(blockPos) as? LiftBlockEntity)?.let {
-            val distance = MathHelper.sqrt(blockPos.getSquaredDistance(pos.x+0.0, pos.y+0.0, pos.z+0.0, true))
+            val distance = MathHelper.sqrt(blockPos.getSquaredDistance(pos.x+0.0, pos.y+0.0, pos.z+0.0, true).toFloat())
             if(distance > MAX_LIFT_DISTANCE) {
                 LinkActionResult.TOO_FAR_AWAY
             }else {
@@ -43,6 +43,7 @@ class LiftButtonBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(Block
     companion object {
         const val MAX_LIFT_DISTANCE = 16
 
+        @Suppress("unused_parameter")
         fun commonTick(world: World, pos: BlockPos, state: BlockState, entity: LiftButtonBlockEntity) {
             entity.linkedPos?.let {
                 entity.linkedLift = world.getBlockEntity(entity.linkedPos) as? LiftBlockEntity

@@ -44,7 +44,7 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
             }, { button, _, _, _ ->
                 tooltipBtnReference[button]?.let { LateTooltipHolder.scheduleLateTooltip(it, LateTooltipHolder.TooltipMode.RED) }
             })
-            this.method_37063(btn) //Add drawable
+            this.addDrawableChild(btn)
             if(btn.y + btn.height > 118) {
                 if(!scrollable) {
                     scrollable = true
@@ -116,7 +116,7 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
                 val actionResult = client?.world?.let { world -> blockEntity.liftShaft?.sendPlatformTo(world, lift, true) }
                 if(actionResult?.isAccepted() == false) {
                     btn.active = false
-                    tooltipBtnReference[btn] = TranslatableText("screen.lifts.tooltip.${actionResult.name.toLowerCase()}")
+                    tooltipBtnReference[btn] = TranslatableText("screen.lifts.tooltip.${actionResult.name.lowercase()}")
                 }else{
                     btn.active = true
                     tooltipBtnReference.remove(btn)

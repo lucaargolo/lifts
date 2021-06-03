@@ -1,13 +1,11 @@
 package io.github.lucaargolo.lifts.common.blockentity.charger
 
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
-import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import io.github.lucaargolo.lifts.utils.LinkActionResult
 import io.github.lucaargolo.lifts.utils.Linkable
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
-import net.minecraft.block.entity.BlockEntityTicker
 import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
@@ -24,7 +22,7 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
 
     override fun link(blockPos: BlockPos): LinkActionResult {
         return (world?.getBlockEntity(blockPos) as? ScreenBlockEntity)?.let {
-            val distance = MathHelper.sqrt(blockPos.getSquaredDistance(pos.x+0.0, pos.y+0.0, pos.z+0.0, true))
+            val distance = MathHelper.sqrt(blockPos.getSquaredDistance(pos.x+0.0, pos.y+0.0, pos.z+0.0, true).toFloat())
             if(distance > MAX_SCREEN_DISTANCE) {
                 LinkActionResult.TOO_FAR_AWAY
             }else {
@@ -62,6 +60,7 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
     companion object {
         const val MAX_SCREEN_DISTANCE = 128
 
+        @Suppress("unused_parameter")
         fun commonTick(world: World, pos: BlockPos, state: BlockState, entity: ChargerBlockEntity) {
             entity.longArray?.forEach {
                 entity.link(BlockPos.fromLong(it))

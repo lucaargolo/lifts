@@ -48,7 +48,7 @@ class PlatformEntity: Entity {
     }
 
     override fun tick() {
-        val newCollidingEntities = this.world.getOtherEntities(null, this.boundingBox.expand(0.0, 0.3, 0.0)) {it !is PlatformEntity}
+        val newCollidingEntities = this.world.getOtherEntities(this, this.boundingBox.expand(0.0, 0.3, 0.0))
         collidingEntities?.forEach {
             if(!newCollidingEntities.contains(it)) {
                 it.fallDistance = 0f
