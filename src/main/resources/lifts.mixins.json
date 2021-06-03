@@ -7,7 +7,6 @@
     "LivingEntityMixin"
   ],
   "client": [
-    "BackgroundRendererMixin",
     "KeyBindingAccessor",
     "MinecraftClientMixin",
     "MouseMixin"

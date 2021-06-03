@@ -7,7 +7,6 @@ import io.github.lucaargolo.lifts.client.screen.UnlinkedScreen
 import io.github.lucaargolo.lifts.common.block.screen.ScreenBlockHandler
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import io.github.lucaargolo.lifts.compat.OptifineShadersCompat
-import io.github.lucaargolo.lifts.utils.BackgroundRendererCache
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.*
 import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
@@ -56,7 +55,7 @@ class ScreenBlockEntityRenderer(private val dispatcher: BlockEntityRenderDispatc
         RenderSystem.applyModelViewMatrix()
         RenderSystem.setShaderFogColor(0.0f, 0.0f, 0.0f, 0.0f)
         entity.screen?.render(MatrixStack(), mousePos.first.toInt(), mousePos.second.toInt(), client.lastFrameDuration)
-        BackgroundRendererCache.restoreCache()
+        BackgroundRenderer.setFogBlack()
         modelViewStack.pop()
         RenderSystem.applyModelViewMatrix()
         RenderSystem.restoreProjectionMatrix()

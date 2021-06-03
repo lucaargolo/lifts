@@ -61,9 +61,6 @@ class PlatformEntity: Entity {
             val elevationOffset = pos.y - oldElevation
             collidingEntities?.forEach {
                 it.addVelocity(0.0, elevationOffset-it.velocity.y, 0.0)
-                if(it.y <= this.y) {
-                    it.updatePosition(it.pos.x, this.y+0.3, it.pos.z)
-                }
             }
         }
         progress = (pos.y-initialElevation)/(finalElevation - initialElevation)
