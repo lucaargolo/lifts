@@ -48,15 +48,7 @@ class PlatformEntity: Entity {
     }
 
     override fun tick() {
-        val newCollidingEntities = this.world.getOtherEntities(this, this.boundingBox.expand(0.0, 0.3, 0.0))
-        collidingEntities?.forEach {
-            if(!newCollidingEntities.contains(it)) {
-                it.fallDistance = 0f
-                it.velocity = this.velocity
-                it.velocityDirty = true
-            }
-        }
-        collidingEntities = newCollidingEntities
+        collidingEntities = this.world.getOtherEntities(this, this.boundingBox.expand(0.0, 0.3, 0.0))
         var progress = (pos.y-initialElevation)/(finalElevation - initialElevation)
         if(progress < 1.0) {
             val d = if(pos.y > finalElevation) -1 else 1
@@ -68,8 +60,10 @@ class PlatformEntity: Entity {
             move(MovementType.SELF, Vec3d(0.0, (vel+(d*0.1))*0.5, 0.0))
             val elevationOffset = pos.y - oldElevation
             collidingEntities?.forEach {
-                it.fallDistance = 0f
                 it.addVelocity(0.0, elevationOffset-it.velocity.y, 0.0)
+                if(it.y <= this.y) {
+                    it.updatePosition(it.pos.x, this.y+0.3, it.pos.z)
+                }
             }
         }
         progress = (pos.y-initialElevation)/(finalElevation - initialElevation)
@@ -77,7 +71,6 @@ class PlatformEntity: Entity {
             if(sameLastProgress++ >= 3) {
                 val yPos = removeBlockMatrix()
                 collidingEntities?.forEach {
-                    it.fallDistance = 0f
                     it.teleport(it.pos.x, yPos+1.0, it.pos.z)
                 }
             }
@@ -87,7 +80,6 @@ class PlatformEntity: Entity {
         if(progress >= 1.0) {
             val yPos = removeBlockMatrix()
             collidingEntities?.forEach {
-                it.fallDistance = 0f
                 it.teleport(it.pos.x, yPos+1.0, it.pos.z)
             }
         }
