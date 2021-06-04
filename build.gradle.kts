@@ -1,3 +1,4 @@
+import org.ajoberstar.grgit.Grgit
 import org.kohsuke.github.GitHub
 import org.kohsuke.github.GHReleaseBuilder
 import com.matthewprenger.cursegradle.CurseProject
@@ -46,6 +47,11 @@ fun getChangeLog(): String {
 fun getBranch(): String {
     environment["GITHUB_REF"]?.let { branch ->
         return branch.substring(branch.lastIndexOf("/") + 1)
+    }
+    val grgit = try {
+        extensions.getByName("grgit") as Grgit
+    }catch (ignored: Exception) {
+        return "unknown"
     }
     val branch = grgit.branch.current().name
     return branch.substring(branch.lastIndexOf("/") + 1)
