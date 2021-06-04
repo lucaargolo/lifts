@@ -3,6 +3,7 @@ import org.kohsuke.github.GitHub
 import org.kohsuke.github.GHReleaseBuilder
 import com.matthewprenger.cursegradle.CurseProject
 import com.matthewprenger.cursegradle.CurseArtifact
+import com.matthewprenger.cursegradle.CurseRelation
 import com.matthewprenger.cursegradle.Options
 import com.modrinth.minotaur.TaskModrinthUpload
 import com.modrinth.minotaur.request.VersionType
@@ -154,6 +155,10 @@ curseforge {
 
         mainArtifact(file(releaseFile), closureOf<CurseArtifact> {
             displayName = releaseName
+            relations(closureOf<CurseRelation> {
+                requiredDependency("fabric-api")
+                requiredDependency("fabric-language-kotlin")
+            })
         })
 
         afterEvaluate {
