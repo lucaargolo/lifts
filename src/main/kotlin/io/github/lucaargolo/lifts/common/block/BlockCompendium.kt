@@ -59,8 +59,11 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
 
     fun registerBlockItems(itemMap: MutableMap<Identifier, Item>) {
         map.forEach { (identifier, block) ->
+            val itemSettings = creativeGroupSettings().let {
+                if(block == NETHERITE_STRUCTURE || block == ELECTRIC_LIFT_MK5) { it.fireproof() } else { it }
+            }
             itemMap[identifier] = when(block) {
-                is StirlingLift -> object: BlockItem(block, creativeGroupSettings()) {
+                is StirlingLift -> object: BlockItem(block, itemSettings) {
                     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
                         super.appendTooltip(stack, world, tooltip, context)
                         tooltip.add(TranslatableText("tooltip.lifts.powered_by_coal").formatted(Formatting.ITALIC, Formatting.DARK_PURPLE))
@@ -72,7 +75,7 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
                         }
                     }
                 }
-                is ElectricLift -> object: BlockItem(block, creativeGroupSettings()) {
+                is ElectricLift -> object: BlockItem(block, itemSettings) {
                     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
                         super.appendTooltip(stack, world, tooltip, context)
                         tooltip.add(TranslatableText("tooltip.lifts.powered_by_energy").formatted(Formatting.ITALIC, Formatting.DARK_PURPLE))
@@ -86,13 +89,13 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
                         }
                     }
                 }
-                is LiftDetector, is LiftButton, is Charger, is ScreenBlock -> object: BlockItem(block, creativeGroupSettings()) {
+                is LiftDetector, is LiftButton, is Charger, is ScreenBlock -> object: BlockItem(block, itemSettings) {
                     override fun appendTooltip(stack: ItemStack, world: World?, tooltip: MutableList<Text>, context: TooltipContext) {
                         super.appendTooltip(stack, world, tooltip, context)
                         tooltip.add(TranslatableText("tooltip.lifts.${identifier.path}").formatted(Formatting.ITALIC, Formatting.DARK_PURPLE))
                     }
                 }
-                else -> BlockItem(block, creativeGroupSettings())
+                else -> BlockItem(block, itemSettings)
             }
         }
     }

@@ -1,0 +1,24 @@
+{
+  "replace": false,
+  "values": [
+    "lifts:coal_structure",
+    "lifts:iron_structure",
+    "lifts:gold_structure",
+    "lifts:diamond_structure",
+    "lifts:emerald_structure",
+    "lifts:netherite_structure",
+    "lifts:machine_block",
+    "lifts:machine_block_slab",
+    "lifts:stirling_machine_block",
+    "lifts:stirling_lift",
+    "lifts:electric_lift_mk1",
+    "lifts:electric_lift_mk2",
+    "lifts:electric_lift_mk3",
+    "lifts:electric_lift_mk4",
+    "lifts:electric_lift_mk5",
+    "lifts:lift_detector",
+    "lifts:lift_button",
+    "lifts:screen_charger",
+    "lifts:screen"
+  ]
+}

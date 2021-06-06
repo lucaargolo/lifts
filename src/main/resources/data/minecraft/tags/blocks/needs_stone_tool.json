@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "lifts:iron_structure",
+    "lifts:machine_block",
+    "lifts:machine_block_slab",
+    "lifts:electric_lift_mk1",
+    "lifts:lift_detector",
+    "lifts:screen_charger",
+    "lifts:screen"
+  ]
+}
