@@ -15,7 +15,7 @@ class LinkingTool(settings: Settings): Item(settings) {
         val stack = context.stack
         val world = context.world
         val blockPos = context.blockPos
-        val tag = stack.orCreateTag
+        val tag = stack.orCreateNbt
         if(player.isSneaking) {
             tag.putLong("pos", blockPos.asLong())
             if(!world.isClient) {
@@ -27,7 +27,7 @@ class LinkingTool(settings: Settings): Item(settings) {
             (world.getBlockEntity(blockPos) as? Linkable)?.let{ linkable ->
                 val linkActionResult = linkable.link(posToLink)
                 if(!world.isClient) {
-                    player.sendMessage(TranslatableText("message.lifts.link.${linkActionResult.name.toLowerCase()}").formatted(if(linkActionResult.isAccepted()) Formatting.GREEN else Formatting.RED), true)
+                    player.sendMessage(TranslatableText("message.lifts.link.${linkActionResult.name.lowercase()}").formatted(if(linkActionResult.isAccepted()) Formatting.GREEN else Formatting.RED), true)
                 }
                 return if(linkActionResult.isAccepted()) ActionResult.SUCCESS else ActionResult.FAIL
             }

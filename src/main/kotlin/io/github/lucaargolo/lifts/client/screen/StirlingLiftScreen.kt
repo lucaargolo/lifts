@@ -19,7 +19,7 @@ class StirlingLiftScreen(handler: StirlingLiftScreenHandler, inventory: PlayerIn
     override fun init() {
         super.init()
         titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2
-        this.addDrawableChild(ButtonWidget(x+61, y+51, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().openScreen(RenameLiftScreen(handler.entity)) })
+        this.addDrawableChild(ButtonWidget(x+61, y+51, 90, 20, TranslatableText("screen.lifts.common.rename_lift")) { MinecraftClient.getInstance().setScreen(RenameLiftScreen(handler.entity)) })
     }
 
     override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {

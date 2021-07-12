@@ -43,7 +43,7 @@ object PacketCompendium {
 
                 entity.pitch = pitch * 360 / 256.0f
                 entity.yaw = yaw * 360 / 256.0f
-                entity.setEntityId(id)
+                entity.id = id
                 entity.uuid = uuid
 
                 tag?.let { entity.readBlockMatrixFromTag(tag) }
