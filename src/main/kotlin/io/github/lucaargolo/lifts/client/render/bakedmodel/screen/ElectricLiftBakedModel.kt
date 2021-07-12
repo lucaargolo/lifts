@@ -35,7 +35,7 @@ class ElectricLiftBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
         ModIdentifier("block/electric_lift")
     )
 
-    private val modelList = mutableListOf<BakedModel>()
+    val modelList = mutableListOf<BakedModel>()
 
     private val spriteIdList = mutableListOf(
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/machine_base")),
@@ -46,7 +46,7 @@ class ElectricLiftBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/mk4_overlay")),
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/mk5_overlay"))
     )
-    private val spriteList = mutableListOf<Sprite>()
+    val spriteList = mutableListOf<Sprite>()
 
     override fun getModelDependencies(): Collection<Identifier> = listOf()
 

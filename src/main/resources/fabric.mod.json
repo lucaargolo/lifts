@@ -24,6 +24,12 @@
       "io.github.lucaargolo.lifts.Lifts"
     ]
   },
+  "custom": {
+    "dashloader:customobject": [
+      "io.github.lucaargolo.lifts.compat.DashElectricLiftBakedModel",
+      "io.github.lucaargolo.lifts.compat.DashScreenBakedModel"
+    ]
+  },
   "mixins": [
     "lifts.mixins.json"
   ],

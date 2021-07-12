@@ -34,7 +34,7 @@ class ScreenBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
         ModIdentifier("block/screen")
     )
 
-    private val modelList = mutableListOf<BakedModel>()
+    val modelList = mutableListOf<BakedModel>()
 
     private val spriteIdList = mutableListOf(
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/screen_border")),
@@ -42,7 +42,7 @@ class ScreenBakedModel: UnbakedModel, BakedModel, FabricBakedModel {
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/machine_base")),
         SpriteIdentifier(PlayerScreenHandler.BLOCK_ATLAS_TEXTURE, ModIdentifier("block/screen_side"))
     )
-    private val spriteList = mutableListOf<Sprite>()
+    val spriteList = mutableListOf<Sprite>()
 
     override fun getModelDependencies(): Collection<Identifier> = listOf()
 
