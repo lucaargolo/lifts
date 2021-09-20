@@ -1,7 +1,6 @@
 package io.github.lucaargolo.lifts.common.block.misc
 
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
-import io.github.lucaargolo.lifts.common.blockentity.lift.StirlingLiftBlockEntity
 import io.github.lucaargolo.lifts.common.blockentity.misc.LiftDetectorBlockEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockRenderType
@@ -52,7 +51,7 @@ class LiftDetector(settings: Settings): BlockWithEntity(settings)  {
         NOT_HERE,
         HERE;
 
-        override fun asString() = name.toLowerCase()
+        override fun asString() = name.lowercase()
     }
 
     companion object {

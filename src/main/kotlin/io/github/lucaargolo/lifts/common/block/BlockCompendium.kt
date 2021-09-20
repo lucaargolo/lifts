@@ -27,7 +27,6 @@ import net.minecraft.util.Formatting
 import net.minecraft.util.Identifier
 import net.minecraft.util.registry.Registry
 import net.minecraft.world.World
-import team.reborn.energy.EnergyTier
 
 object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
 
@@ -43,11 +42,11 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
     val STIRLING_MACHINE_BLOCK = register("stirling_machine_block", Block(AbstractBlock.Settings.copy(Blocks.COBBLESTONE)))
 
     val STIRLING_LIFT = register("stirling_lift", StirlingLift(AbstractBlock.Settings.copy(Blocks.COBBLESTONE), Lifts.CONFIG.liftConfigs.stirlingLift))
-    val ELECTRIC_LIFT_MK1 = register("electric_lift_mk1", ElectricLift(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk1, EnergyTier.LOW))
-    val ELECTRIC_LIFT_MK2 = register("electric_lift_mk2", ElectricLift(AbstractBlock.Settings.copy(Blocks.GOLD_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk2, EnergyTier.MEDIUM))
-    val ELECTRIC_LIFT_MK3 = register("electric_lift_mk3", ElectricLift(AbstractBlock.Settings.copy(Blocks.DIAMOND_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk3, EnergyTier.HIGH))
-    val ELECTRIC_LIFT_MK4 = register("electric_lift_mk4", ElectricLift(AbstractBlock.Settings.copy(Blocks.EMERALD_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk4, EnergyTier.EXTREME))
-    val ELECTRIC_LIFT_MK5 = register("electric_lift_mk5", ElectricLift(AbstractBlock.Settings.copy(Blocks.NETHERITE_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk5, EnergyTier.INSANE))
+    val ELECTRIC_LIFT_MK1 = register("electric_lift_mk1", ElectricLift(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk1, 32))
+    val ELECTRIC_LIFT_MK2 = register("electric_lift_mk2", ElectricLift(AbstractBlock.Settings.copy(Blocks.GOLD_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk2, 128))
+    val ELECTRIC_LIFT_MK3 = register("electric_lift_mk3", ElectricLift(AbstractBlock.Settings.copy(Blocks.DIAMOND_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk3, 512))
+    val ELECTRIC_LIFT_MK4 = register("electric_lift_mk4", ElectricLift(AbstractBlock.Settings.copy(Blocks.EMERALD_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk4, 2048))
+    val ELECTRIC_LIFT_MK5 = register("electric_lift_mk5", ElectricLift(AbstractBlock.Settings.copy(Blocks.NETHERITE_BLOCK), Lifts.CONFIG.liftConfigs.electricLiftMk5, 8192))
 
     val LIFT_DETECTOR = register("lift_detector", LiftDetector(AbstractBlock.Settings.copy(Blocks.IRON_BLOCK)))
 
@@ -83,7 +82,7 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
                             displayHiddenTooltip(tooltip) {
                                 tooltip.add(TranslatableText("tooltip.lifts.common.platform_speed").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformSpeed}").formatted(Formatting.GRAY)))
                                 tooltip.add(TranslatableText("tooltip.lifts.common.platform_range").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftConfig.platformRange} ").append(TranslatableText("tooltip.lifts.common.blocks")).formatted(Formatting.GRAY)))
-                                tooltip.add(TranslatableText("tooltip.lifts.common.energy_input").formatted(Formatting.BLUE).append(LiteralText(": ${block.energyTier.maxInput} E/tick").formatted(Formatting.GRAY)))
+                                tooltip.add(TranslatableText("tooltip.lifts.common.energy_input").formatted(Formatting.BLUE).append(LiteralText(": ${block.liftMaxExtract} E/tick").formatted(Formatting.GRAY)))
                                 tooltip.add(TranslatableText("tooltip.lifts.common.energy_capacity").formatted(Formatting.BLUE).append(LiteralText(": ${block.electricLiftConfig.energyCapacity} E").formatted(Formatting.GRAY)))
                             }
                         }

@@ -7,18 +7,25 @@ import io.github.lucaargolo.lifts.utils.Linkable
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtDouble
+import net.minecraft.nbt.NbtLong
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
-import team.reborn.energy.EnergySide
-import team.reborn.energy.EnergyStorage
-import team.reborn.energy.EnergyTier
+import team.reborn.energy.api.base.SimpleEnergyStorage
 
-class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEntityCompendium.SCREEN_CHARGER_TYPE, pos, state), Linkable, EnergyStorage {
+class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEntityCompendium.SCREEN_CHARGER_TYPE, pos, state), Linkable {
 
     private var longArray: LongArray? = null
     private val linkedScreens = linkedSetOf<ScreenBlockEntity>()
-    private var storedEnergy = 0.0
+
+    @Suppress("UnstableApiUsage")
+    val energyStorage = object: SimpleEnergyStorage(128000, 512, 0) {
+        override fun onFinalCommit() {
+            super.onFinalCommit()
+            markDirty()
+        }
+    }
 
     override fun link(blockPos: BlockPos): LinkActionResult {
         return (world?.getBlockEntity(blockPos) as? ScreenBlockEntity)?.let {
@@ -32,20 +39,8 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
         } ?: LinkActionResult.NOT_SCREEN
     }
 
-    override fun getMaxStoredPower() = 128000.0
-
-    override fun getMaxOutput(side: EnergySide?) = 0.0
-
-    override fun getTier() = EnergyTier.HIGH
-
-    override fun getStored(face: EnergySide?) = storedEnergy
-
-    override fun setStored(amount: Double) {
-        storedEnergy = amount
-    }
-
     override fun writeNbt(tag: NbtCompound): NbtCompound {
-        tag.putDouble("storedEnergy", storedEnergy)
+        tag.putLong("storedEnergy", energyStorage.amount)
         val longArray = linkedScreens.map { it.pos.asLong() }.toLongArray()
         tag.putLongArray("linkedScreens", longArray)
         return super.writeNbt(tag)
@@ -53,7 +48,11 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
 
     override fun readNbt(tag: NbtCompound) {
         super.readNbt(tag)
-        storedEnergy = tag.getDouble("storedEnergy")
+        val storedEnergy = tag.get("storedEnergy") ?: NbtLong.of(0L)
+        when(storedEnergy.nbtType) {
+            NbtLong.TYPE -> energyStorage.amount = tag.getLong("storedEnergy")
+            NbtDouble.TYPE -> energyStorage.amount = MathHelper.floor(tag.getDouble("storedEnergy")).toLong()
+        }
         longArray = tag.getLongArray("linkedScreens")
     }
 
@@ -67,21 +66,21 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
                 entity.longArray = null
             }
             val iterator = entity.linkedScreens.iterator()
-            val splitEnergy = (entity.storedEnergy/entity.linkedScreens.size).coerceAtMost(32.0)
+            val splitEnergy = (entity.energyStorage.amount/entity.linkedScreens.size).coerceAtMost(32)
             while(iterator.hasNext()) {
                 val screen = iterator.next()
                 if(screen.isRemoved) {
                     iterator.remove()
                 }else{
-                    val oldScreenStored = screen.getStored(null)
-                    val screenMaxStored = screen.maxStoredPower
+                    val oldScreenStored = screen.energyStorage.amount
+                    val screenMaxStored = screen.energyStorage.capacity
                     if(oldScreenStored + splitEnergy <= screenMaxStored) {
-                        screen.setStored(oldScreenStored+splitEnergy)
-                        entity.storedEnergy -= splitEnergy
+                        screen.energyStorage.amount = oldScreenStored+splitEnergy
+                        entity.energyStorage.amount -= splitEnergy
                         entity.markDirty()
                     }else if(oldScreenStored < screenMaxStored) {
-                        screen.setStored(screenMaxStored)
-                        entity.storedEnergy -= (screenMaxStored - oldScreenStored)
+                        screen.energyStorage.amount = screenMaxStored
+                        entity.energyStorage.amount -= (screenMaxStored - oldScreenStored)
                         entity.markDirty()
                     }
                 }

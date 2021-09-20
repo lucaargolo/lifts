@@ -16,7 +16,7 @@ import net.minecraft.world.World
 
 class ElectricLiftScreenHandler(syncId: Int, private val playerInventory: PlayerInventory, val entity: ElectricLiftBlockEntity, private val context: ScreenHandlerContext): ScreenHandler(ScreenHandlerCompendium.ELECTRIC_LIFT_TYPE, syncId)  {
 
-    var energyStored = 0.0
+    var energyStored = 0L
 
     init {
         (0..2).forEach { n ->
@@ -32,12 +32,12 @@ class ElectricLiftScreenHandler(syncId: Int, private val playerInventory: Player
 
     override fun sendContentUpdates() {
         (playerInventory.player as? ServerPlayerEntity)?.let { player ->
-            if(entity.getStored(null) != energyStored) {
-                val double = entity.getStored(null)
+            if(entity.energyStorage.amount != energyStored) {
+                val long = entity.energyStorage.amount
                 val buf = PacketByteBufs.create()
-                buf.writeDouble(double)
+                buf.writeLong(long)
                 ServerPlayNetworking.send(player, PacketCompendium.UPDATE_ELECTRIC_LIFT_SCREEN_HANDLER, buf)
-                energyStored = double
+                energyStored = long
             }
         }
         super.sendContentUpdates()

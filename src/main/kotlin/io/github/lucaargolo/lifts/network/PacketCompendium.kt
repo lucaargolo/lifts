@@ -15,10 +15,10 @@ object PacketCompendium {
     val UPDATE_ELECTRIC_LIFT_SCREEN_HANDLER = ModIdentifier("update_electric_lift_screen_handler")
 
     fun onInitializeClient() {
-        ClientPlayNetworking.registerGlobalReceiver(UPDATE_ELECTRIC_LIFT_SCREEN_HANDLER) { client, handler, buf, _ ->
-            val double = buf.readDouble()
+        ClientPlayNetworking.registerGlobalReceiver(UPDATE_ELECTRIC_LIFT_SCREEN_HANDLER) { client, _, buf, _ ->
+            val long = buf.readLong()
             client.execute {
-                (client.currentScreen as? ElectricLiftScreen)?.screenHandler?.energyStored = double
+                (client.currentScreen as? ElectricLiftScreen)?.screenHandler?.energyStored = long
             }
         }
         ClientPlayNetworking.registerGlobalReceiver(SPAWN_PLATFORM_ENTITY) {client, handler, buf, _ ->

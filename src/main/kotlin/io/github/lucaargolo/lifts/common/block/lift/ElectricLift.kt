@@ -21,9 +21,8 @@ import net.minecraft.util.Hand
 import net.minecraft.util.hit.BlockHitResult
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
-import team.reborn.energy.EnergyTier
 
-class ElectricLift(settings: Settings, val electricLiftConfig: ModConfig.ElectricLiftConfig, val energyTier: EnergyTier): Lift(settings, electricLiftConfig) {
+class ElectricLift(settings: Settings, val electricLiftConfig: ModConfig.ElectricLiftConfig, val liftMaxExtract: Long): Lift(settings, electricLiftConfig) {
 
     override fun createBlockEntity(pos: BlockPos, state: BlockState) = ElectricLiftBlockEntity(pos, state)
 

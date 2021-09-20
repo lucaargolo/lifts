@@ -8,14 +8,14 @@ import io.github.lucaargolo.lifts.utils.SynchronizeableBlockEntity
 import net.minecraft.block.BlockState
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.nbt.NbtCompound
+import net.minecraft.nbt.NbtDouble
+import net.minecraft.nbt.NbtLong
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.world.World
-import team.reborn.energy.EnergySide
-import team.reborn.energy.EnergyStorage
-import team.reborn.energy.EnergyTier
+import team.reborn.energy.api.base.SimpleEnergyStorage
 
-class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN_TYPE, pos, state), Linkable, EnergyStorage {
+class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockEntity(BlockEntityCompendium.SCREEN_TYPE, pos, state), Linkable {
 
     enum class State {
         NO_ENERGY,
@@ -23,7 +23,13 @@ class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockE
         LINKED
     }
 
-    private var storedEnergy = 0.0
+    @Suppress("UnstableApiUsage")
+    val energyStorage = object: SimpleEnergyStorage(16000, 32, 0) {
+        override fun onFinalCommit() {
+            super.onFinalCommit()
+            markDirty()
+        }
+    }
 
     var state = State.NO_ENERGY
         set(value) {
@@ -54,7 +60,7 @@ class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockE
     var tickDelay = 0
 
     override fun writeNbt(tag: NbtCompound): NbtCompound {
-        tag.putDouble("storedEnergy", storedEnergy)
+        tag.putLong("storedEnergy", energyStorage.amount)
         linkedLift?.let { tag.putLong("linkedLift", it.pos.asLong()) }
         linkedPos?.let { tag.putLong("linkedLift", it.asLong()) }
         tag.putString("state", state.name)
@@ -63,7 +69,11 @@ class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockE
 
     override fun readNbt(tag: NbtCompound) {
         super.readNbt(tag)
-        storedEnergy = tag.getDouble("storedEnergy")
+        val storedEnergy = tag.get("storedEnergy") ?: NbtLong.of(0L)
+        when(storedEnergy.nbtType) {
+            NbtLong.TYPE -> energyStorage.amount = tag.getLong("storedEnergy")
+            NbtDouble.TYPE -> energyStorage.amount = MathHelper.floor(tag.getDouble("storedEnergy")).toLong()
+        }
         linkedPos = if(tag.contains("linkedLift")) {
             BlockPos.fromLong(tag.getLong("linkedLift"))
         } else { null }
@@ -73,18 +83,6 @@ class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockE
             e.printStackTrace()
             State.NO_ENERGY
         }
-    }
-
-    override fun getMaxStoredPower() = 16000.0
-
-    override fun getMaxOutput(side: EnergySide?) = 0.0
-
-    override fun getTier() = EnergyTier.LOW
-
-    override fun getStored(side: EnergySide?) = storedEnergy
-
-    override fun setStored(storedEnergy: Double) {
-        this.storedEnergy = storedEnergy
     }
 
     companion object {
@@ -103,12 +101,12 @@ class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockE
             if(world.isClient) return
             if(entity.tickDelay > 20) {
                 when(entity.state) {
-                    State.NO_ENERGY -> if(entity.storedEnergy >= 100.0) entity.state = State.LINKED
+                    State.NO_ENERGY -> if(entity.energyStorage.amount >= 100) entity.state = State.LINKED
                     State.UNLINKED, State.LINKED -> {
-                        if(entity.storedEnergy < 100.0) {
+                        if(entity.energyStorage.amount < 100) {
                             entity.state = State.NO_ENERGY
                         }else{
-                            entity.storedEnergy--
+                            entity.energyStorage.amount--
                         }
                         if(entity.state == State.UNLINKED && entity.linkedLift != null) {
                             entity.state = State.LINKED
@@ -122,8 +120,8 @@ class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockE
                 entity.tickDelay = 0
             }else{
                 entity.tickDelay++
-                if(entity.state != State.NO_ENERGY && entity.storedEnergy > 0.0) {
-                    entity.storedEnergy--
+                if(entity.state != State.NO_ENERGY && entity.energyStorage.amount > 0.0) {
+                    entity.energyStorage.amount--
                     entity.markDirty()
                 }
             }
