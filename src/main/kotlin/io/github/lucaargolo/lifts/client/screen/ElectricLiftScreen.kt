@@ -30,7 +30,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
         drawMouseoverTooltip(matrices, mouseX, mouseY)
         if((x+25..x+33).contains(mouseX) && (y+17..y+69).contains(mouseY)) {
             val a = TranslatableText("screen.lifts.common.stored_energy").append(": ").formatted(Formatting.RED)
-            val b = LiteralText("%.0f/%.0f E".format(handler.energyStored, handler.entity.energyStorage.capacity)).formatted(Formatting.GRAY)
+            val b = LiteralText("%d/%d E".format(handler.energyStored, handler.entity.energyStorage.capacity)).formatted(Formatting.GRAY)
             renderTooltip(matrices, listOf(a, b), mouseX, mouseY)
         }
     }
