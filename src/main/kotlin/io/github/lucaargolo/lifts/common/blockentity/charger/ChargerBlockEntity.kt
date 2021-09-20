@@ -74,7 +74,7 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
                         iterator.remove()
                     }else{
                         val oldScreenStored = screen.energyStorage.amount
-                        val screenMaxStored = screen.energyStorage.capacity
+                        val screenMaxStored = screen.energyStorage.getCapacity()
                         if(oldScreenStored + splitEnergy <= screenMaxStored) {
                             screen.energyStorage.amount = oldScreenStored+splitEnergy
                             entity.energyStorage.amount -= splitEnergy

@@ -17,29 +17,29 @@ import team.reborn.energy.api.base.SimpleEnergyStorage
 class ElectricLiftBlockEntity(pos: BlockPos, state: BlockState): LiftBlockEntity(BlockEntityCompendium.ELECTRIC_LIFT_TYPE, pos, state) {
 
     private var initializedEnergy = false
-    private var liftMaxExtract = 0L
+    private var liftMaxInsert = 0L
     private var liftCapacity = 0L
 
-    val energyStorage = object: SimpleEnergyStorage(128000, 512, 0) {
-        private fun getMaxExtract(): Long {
-            return liftMaxExtract
+    val energyStorage = object: SimpleEnergyStorage(0, 0, 0) {
+        private fun getMaxInsert(): Long {
+            return liftMaxInsert
         }
 
         override fun getCapacity(): Long {
             return liftCapacity
         }
 
-        override fun supportsExtraction(): Boolean {
-            return getMaxExtract() > 0
+        override fun supportsInsertion(): Boolean {
+            return getMaxInsert() > 0
         }
 
-        override fun extract(maxAmount: Long, transaction: TransactionContext?): Long {
+        override fun insert(maxAmount: Long, transaction: TransactionContext?): Long {
             StoragePreconditions.notNegative(maxAmount)
-            val extracted = getMaxExtract().coerceAtMost(maxAmount.coerceAtMost(amount))
-            if (extracted > 0) {
+            val inserted = getMaxInsert().coerceAtMost(maxAmount.coerceAtMost(getCapacity() - amount))
+            if (inserted > 0) {
                 updateSnapshots(transaction)
-                amount -= extracted
-                return extracted
+                amount += inserted
+                return inserted
             }
             return 0
         }
@@ -95,7 +95,7 @@ class ElectricLiftBlockEntity(pos: BlockPos, state: BlockState): LiftBlockEntity
             LiftBlockEntity.commonTick(world, pos, state, entity)
             if(!entity.initializedEnergy) {
                 (entity.lift as? ElectricLift)?.let {
-                    entity.liftMaxExtract = it.liftMaxExtract
+                    entity.liftMaxInsert = it.liftMaxExtract
                     entity.liftCapacity = it.electricLiftConfig.energyCapacity
                     entity.initializedEnergy = true
                 }

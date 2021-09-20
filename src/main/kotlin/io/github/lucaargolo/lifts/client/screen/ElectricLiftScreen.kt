@@ -30,7 +30,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
         drawMouseoverTooltip(matrices, mouseX, mouseY)
         if((x+25..x+33).contains(mouseX) && (y+17..y+69).contains(mouseY)) {
             val a = TranslatableText("screen.lifts.common.stored_energy").append(": ").formatted(Formatting.RED)
-            val b = LiteralText("%d/%d E".format(handler.energyStored, handler.entity.energyStorage.capacity)).formatted(Formatting.GRAY)
+            val b = LiteralText("%d/%d E".format(handler.energyStored, handler.entity.energyStorage.getCapacity())).formatted(Formatting.GRAY)
             renderTooltip(matrices, listOf(a, b), mouseX, mouseY)
         }
     }
@@ -44,7 +44,7 @@ class ElectricLiftScreen(handler: ElectricLiftScreenHandler, inventory: PlayerIn
     override fun drawBackground(matrices: MatrixStack, delta: Float, mouseX: Int, mouseY: Int) {
         RenderSystem.setShaderTexture(0, texture)
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight)
-        val energyPercentage = handler.energyStored/handler.entity.energyStorage.capacity.toDouble()
+        val energyPercentage = handler.energyStored/handler.entity.energyStorage.getCapacity().toDouble()
         val energyOffset = MathHelper.lerp(energyPercentage, 0.0, 52.0).toInt()
         drawTexture(matrices, x+25, y+17+(52-energyOffset), 176, 0, 8, energyOffset)
     }
