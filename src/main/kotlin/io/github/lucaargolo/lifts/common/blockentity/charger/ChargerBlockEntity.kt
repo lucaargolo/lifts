@@ -65,28 +65,29 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
                 entity.link(BlockPos.fromLong(it))
                 entity.longArray = null
             }
-            val iterator = entity.linkedScreens.iterator()
-            val splitEnergy = (entity.energyStorage.amount/entity.linkedScreens.size).coerceAtMost(32)
-            while(iterator.hasNext()) {
-                val screen = iterator.next()
-                if(screen.isRemoved) {
-                    iterator.remove()
-                }else{
-                    val oldScreenStored = screen.energyStorage.amount
-                    val screenMaxStored = screen.energyStorage.capacity
-                    if(oldScreenStored + splitEnergy <= screenMaxStored) {
-                        screen.energyStorage.amount = oldScreenStored+splitEnergy
-                        entity.energyStorage.amount -= splitEnergy
-                        entity.markDirty()
-                    }else if(oldScreenStored < screenMaxStored) {
-                        screen.energyStorage.amount = screenMaxStored
-                        entity.energyStorage.amount -= (screenMaxStored - oldScreenStored)
-                        entity.markDirty()
+            if(entity.linkedScreens.size > 0) {
+                val iterator = entity.linkedScreens.iterator()
+                val splitEnergy = (entity.energyStorage.amount/entity.linkedScreens.size).coerceAtMost(32)
+                while(iterator.hasNext()) {
+                    val screen = iterator.next()
+                    if(screen.isRemoved) {
+                        iterator.remove()
+                    }else{
+                        val oldScreenStored = screen.energyStorage.amount
+                        val screenMaxStored = screen.energyStorage.capacity
+                        if(oldScreenStored + splitEnergy <= screenMaxStored) {
+                            screen.energyStorage.amount = oldScreenStored+splitEnergy
+                            entity.energyStorage.amount -= splitEnergy
+                            entity.markDirty()
+                        }else if(oldScreenStored < screenMaxStored) {
+                            screen.energyStorage.amount = screenMaxStored
+                            entity.energyStorage.amount -= (screenMaxStored - oldScreenStored)
+                            entity.markDirty()
+                        }
                     }
                 }
             }
         }
-
     }
 
 }
