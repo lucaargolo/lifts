@@ -9,7 +9,10 @@ import io.github.lucaargolo.lifts.common.blockentity.misc.LiftDetectorBlockEntit
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import io.github.lucaargolo.lifts.utils.RegistryCompendium
 import net.minecraft.block.entity.BlockEntityType
+import net.minecraft.state.property.Properties
+import net.minecraft.util.math.Direction
 import net.minecraft.util.registry.Registry
+import team.reborn.energy.api.EnergyStorage
 
 @Suppress("UNCHECKED_CAST")
 object BlockEntityCompendium: RegistryCompendium<BlockEntityType<*>>(Registry.BLOCK_ENTITY_TYPE) {
@@ -24,5 +27,21 @@ object BlockEntityCompendium: RegistryCompendium<BlockEntityType<*>>(Registry.BL
     val SCREEN_CHARGER_TYPE = register("screen_charger", BlockEntityType.Builder.create( { pos, state -> ChargerBlockEntity(pos, state) }, BlockCompendium.SCREEN_CHARGER).build(null)) as BlockEntityType<ChargerBlockEntity>
 
     val SCREEN_TYPE = register("screen", BlockEntityType.Builder.create( { pos, state -> ScreenBlockEntity(pos, state) }, BlockCompendium.SCREEN ).build(null)) as BlockEntityType<ScreenBlockEntity>
+
+    init {
+        EnergyStorage.SIDED.registerForBlockEntity( {be: ChargerBlockEntity, _ -> be.energyStorage }, SCREEN_CHARGER_TYPE)
+        EnergyStorage.SIDED.registerForBlockEntity( {be: ElectricLiftBlockEntity, dir: Direction? ->
+            when(dir) {
+                be.cachedState[Properties.HORIZONTAL_FACING] -> null
+                else -> be.energyStorage
+            }
+        }, ELECTRIC_LIFT_TYPE )
+        EnergyStorage.SIDED.registerForBlockEntity( {be: ScreenBlockEntity, dir: Direction? ->
+            when(dir) {
+                be.cachedState[Properties.HORIZONTAL_FACING].opposite -> be.energyStorage
+                else -> null
+            }
+        }, SCREEN_TYPE )
+    }
 
 }

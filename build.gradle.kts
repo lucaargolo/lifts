@@ -93,7 +93,7 @@ dependencies {
     modApi("teamreborn:energy:${project["energy_version"]}")
     include("teamreborn:energy:${project["energy_version"]}")
 
-    modImplementation ("net.oskarstrom:DashLoader:${project["dashloader_version"]}")
+    modCompileOnly ("net.oskarstrom:DashLoader:${project["dashloader_version"]}")
 
     modRuntime("com.terraformersmc:modmenu:${project["modmenu_version"]}")
     modRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${project["rei_version"]}")
