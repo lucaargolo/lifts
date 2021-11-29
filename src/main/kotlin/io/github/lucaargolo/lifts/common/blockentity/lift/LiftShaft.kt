@@ -102,7 +102,7 @@ class LiftShaft private constructor(val key: RegistryKey<World>, val x: Int, val
             val platform = PlatformEntity(triple.second, triple.third, world)
             val spawnPos = triple.third
             platform.updatePosition(spawnPos.x + 0.5, spawnPos.y + 0.0, spawnPos.z + 0.5)
-            platform.speed = lift.liftConfig.platformSpeed
+            platform.platformSpeed = lift.liftConfig.platformSpeed
             platform.initialElevation = spawnPos.y + 0.0
             platform.finalElevation = destination.pos.y + 0.0
             if(world.spawnEntity(platform)) {

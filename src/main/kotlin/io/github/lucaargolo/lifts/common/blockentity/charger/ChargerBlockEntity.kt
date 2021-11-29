@@ -39,11 +39,11 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
         } ?: LinkActionResult.NOT_SCREEN
     }
 
-    override fun writeNbt(tag: NbtCompound): NbtCompound {
+    override fun writeNbt(tag: NbtCompound) {
         tag.putLong("storedEnergy", energyStorage.amount)
         val longArray = linkedScreens.map { it.pos.asLong() }.toLongArray()
         tag.putLongArray("linkedScreens", longArray)
-        return super.writeNbt(tag)
+        super.writeNbt(tag)
     }
 
     override fun readNbt(tag: NbtCompound) {

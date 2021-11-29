@@ -59,12 +59,12 @@ class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockE
     var clickDelay = 0
     var tickDelay = 0
 
-    override fun writeNbt(tag: NbtCompound): NbtCompound {
+    override fun writeNbt(tag: NbtCompound) {
         tag.putLong("storedEnergy", energyStorage.amount)
         linkedLift?.let { tag.putLong("linkedLift", it.pos.asLong()) }
         linkedPos?.let { tag.putLong("linkedLift", it.asLong()) }
         tag.putString("state", state.name)
-        return super.writeNbt(tag)
+        super.writeNbt(tag)
     }
 
     override fun readNbt(tag: NbtCompound) {

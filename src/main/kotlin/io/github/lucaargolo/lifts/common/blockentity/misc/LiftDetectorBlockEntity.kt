@@ -30,9 +30,9 @@ class LiftDetectorBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(Blo
         } ?: LinkActionResult.NOT_LIFT
     }
 
-    override fun writeNbt(tag: NbtCompound): NbtCompound {
+    override fun writeNbt(tag: NbtCompound) {
         linkedLift?.let { tag.putLong("linkedLift", it.pos.asLong()) }
-        return super.writeNbt(tag)
+        super.writeNbt(tag)
     }
 
     override fun readNbt(tag: NbtCompound) {

@@ -63,20 +63,18 @@ abstract class LiftBlockEntity(type: BlockEntityType<*>, pos: BlockPos, state: B
     abstract fun preSendRequirements(distance: Int): LiftActionResult
     abstract fun postSendRequirements(distance: Int)
 
-    override fun fromClientTag(tag: NbtCompound) {
-        super.fromClientTag(tag)
-        resetPlatformCache()
-        liftShaft?.updateLift(this)
-    }
-
     override fun readNbt(tag: NbtCompound) {
         super.readNbt(tag)
+        if(world?.isClient == true) {
+            resetPlatformCache()
+            liftShaft?.updateLift(this)
+        }
         liftName = if(tag.contains("liftName")) tag.getString("liftName") else null
     }
 
-    override fun writeNbt(tag: NbtCompound): NbtCompound {
+    override fun writeNbt(tag: NbtCompound) {
         liftName?.let { tag.putString("liftName", it) }
-        return super.writeNbt(tag)
+        super.writeNbt(tag)
     }
 
     companion object {

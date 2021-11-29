@@ -26,7 +26,7 @@ class PlatformEntity: Entity {
 
     private var collidingEntities: List<Entity>? = null
     var blockMatrix: Array<Array<BlockState?>?>? = null
-    var speed = 1.0
+    var platformSpeed = 1.0
     var initialElevation = 0.0
     var finalElevation = 0.0
     var lastProgress = -9999.0
@@ -55,7 +55,7 @@ class PlatformEntity: Entity {
             val h = abs(finalElevation-initialElevation)
             val p = if(progress <= 0.5) progress else 1-progress
             val e = min(p*(1/(5/h)), 1.0)
-            val vel = d*easeInOutSine(e)*(speed/2)
+            val vel = d*easeInOutSine(e)*(platformSpeed/2)
             val oldElevation = pos.y
             move(MovementType.SELF, Vec3d(0.0, (vel+(d*0.1))*0.5, 0.0))
             val elevationOffset = pos.y - oldElevation
@@ -205,7 +205,7 @@ class PlatformEntity: Entity {
         buf.writeNbt(tag)
 
         buf.writeDouble(finalElevation)
-        buf.writeDouble(speed)
+        buf.writeDouble(platformSpeed)
 
         return ServerPlayNetworking.createS2CPacket(PacketCompendium.SPAWN_PLATFORM_ENTITY, buf)
     }

@@ -83,9 +83,9 @@ class ElectricLiftBlockEntity(pos: BlockPos, state: BlockState): LiftBlockEntity
         }
     }
 
-    override fun writeNbt(tag: NbtCompound): NbtCompound {
+    override fun writeNbt(tag: NbtCompound) {
         tag.putLong("storedEnergy", energyStorage.amount)
-        return super.writeNbt(tag)
+        super.writeNbt(tag)
     }
 
     companion object {

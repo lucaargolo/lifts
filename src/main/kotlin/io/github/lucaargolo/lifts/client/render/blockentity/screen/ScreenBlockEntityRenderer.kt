@@ -81,7 +81,7 @@ class ScreenBlockEntityRenderer(private val dispatcher: BlockEntityRenderDispatc
         RenderSystem.setShaderTexture(0, framebuffer.colorAttachment)
         val tessellator = Tessellator.getInstance()
         val bufferBuilder = tessellator.buffer
-        val matrix = matrices.peek().model
+        val matrix = matrices.peek().positionMatrix
 
         bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE)
         bufferBuilder.vertex(matrix, 0f, framebuffer.textureHeight.toFloat(), 0f).texture(1f, 1f).next()

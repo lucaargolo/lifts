@@ -101,11 +101,11 @@ class StirlingLiftBlockEntity(pos: BlockPos, state: BlockState): LiftBlockEntity
         super.readNbt(tag)
     }
 
-    override fun writeNbt(tag: NbtCompound): NbtCompound {
+    override fun writeNbt(tag: NbtCompound) {
         Inventories.writeNbt(tag, inventory)
         tag.putInt("storedTicks", storedTicks)
         tag.putInt("burningTicks", burningTicks)
-        return super.writeNbt(tag)
+        super.writeNbt(tag)
     }
 
     companion object {

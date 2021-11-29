@@ -59,7 +59,7 @@ object LateTooltipHolder: DrawableHelper() {
             val tessellator = Tessellator.getInstance()
             val bufferBuilder = tessellator.buffer
             bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR)
-            val matrix4f = matrices.peek().model
+            val matrix4f = matrices.peek().positionMatrix
             val z = 0
 
             val firstColor: Int = (0xF0000000 + tooltipMode.f).toInt()

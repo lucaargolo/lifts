@@ -50,7 +50,7 @@ object PacketCompendium {
 
                 entity.initialElevation = y
                 entity.finalElevation = finalElevation
-                entity.speed = speed
+                entity.platformSpeed = speed
 
                 world.addEntity(id, entity)
             }
