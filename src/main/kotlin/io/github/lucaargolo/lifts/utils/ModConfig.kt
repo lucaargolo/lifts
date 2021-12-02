@@ -29,4 +29,6 @@ class ModConfig {
 
     val liftConfigs = LiftConfigs()
 
+    val screenScale = 1
+
 }

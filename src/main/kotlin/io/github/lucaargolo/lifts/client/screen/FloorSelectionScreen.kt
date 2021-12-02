@@ -1,5 +1,6 @@
 package io.github.lucaargolo.lifts.client.screen
 
+import io.github.lucaargolo.lifts.Lifts
 import io.github.lucaargolo.lifts.common.blockentity.lift.LiftBlockEntity
 import io.github.lucaargolo.lifts.network.PacketCompendium
 import io.github.lucaargolo.lifts.utils.LateTooltipHolder
@@ -82,6 +83,8 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
     }
 
     override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
+        matrices.push()
+        matrices.scale(Lifts.CONFIG.screenScale+0f, Lifts.CONFIG.screenScale+0f, Lifts.CONFIG.screenScale+0f)
         if(scrollable) {
             children().forEach {
                 (it as? ButtonWidget)?.let { btn ->
@@ -101,10 +104,11 @@ class FloorSelectionScreen(val blockEntity: LiftBlockEntity): Screen(Translatabl
         }else{
             super.render(matrices, mouseX, mouseY, delta)
         }
+        matrices.pop()
     }
 
     override fun tick() {
-        if(children().filterIsInstance(ButtonWidget::class.java).size != blockEntity.liftShaft?.size ?: 0) {
+        if(children().filterIsInstance(ButtonWidget::class.java).size != (blockEntity.liftShaft?.size ?: 0)) {
             init()
         }
         var index = 0
