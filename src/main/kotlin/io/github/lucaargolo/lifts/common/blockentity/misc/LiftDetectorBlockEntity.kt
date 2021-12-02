@@ -25,6 +25,7 @@ class LiftDetectorBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(Blo
                 LinkActionResult.TOO_FAR_AWAY
             }else {
                 linkedLift = it
+                markDirty()
                 LinkActionResult.SUCCESSFUL
             }
         } ?: LinkActionResult.NOT_LIFT

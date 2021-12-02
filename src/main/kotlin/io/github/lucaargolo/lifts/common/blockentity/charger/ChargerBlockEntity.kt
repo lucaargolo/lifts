@@ -34,6 +34,7 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
                 LinkActionResult.TOO_FAR_AWAY
             }else {
                 linkedScreens.add(it)
+                markDirty()
                 LinkActionResult.SUCCESSFUL
             }
         } ?: LinkActionResult.NOT_SCREEN
@@ -63,8 +64,8 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
         fun commonTick(world: World, pos: BlockPos, state: BlockState, entity: ChargerBlockEntity) {
             entity.longArray?.forEach {
                 entity.link(BlockPos.fromLong(it))
-                entity.longArray = null
             }
+            entity.longArray = null
             if(entity.linkedScreens.size > 0) {
                 val iterator = entity.linkedScreens.iterator()
                 val splitEnergy = (entity.energyStorage.amount/entity.linkedScreens.size).coerceAtMost(32)
