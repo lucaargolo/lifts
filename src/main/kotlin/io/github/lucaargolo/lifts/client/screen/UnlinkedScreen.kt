@@ -1,5 +1,6 @@
 package io.github.lucaargolo.lifts.client.screen
 
+import io.github.lucaargolo.lifts.Lifts
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.util.math.MatrixStack
@@ -9,7 +10,9 @@ import net.minecraft.util.Formatting
 
 class UnlinkedScreen: Screen(TranslatableText("screen.lifts.title.unlinked")) {
 
-    override fun render(matrices: MatrixStack?, mouseX: Int, mouseY: Int, delta: Float) {
+    override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
+        matrices.push()
+        matrices.scale(Lifts.CONFIG.screenScale+0f, Lifts.CONFIG.screenScale+0f, Lifts.CONFIG.screenScale+0f)
         drawCenteredText(matrices, textRenderer, TranslatableText("screen.lifts.title.unlinked"), 64, 10, 0xFFFF00)
 
         val linkingToolString = TranslatableText("screen.lifts.please_use_linking_tool").string
@@ -34,6 +37,7 @@ class UnlinkedScreen: Screen(TranslatableText("screen.lifts.title.unlinked")) {
             textRenderer.draw(matrices, text, (64f - textRenderer.getWidth(text)/2), 20f+(index*10), 0xFFFFFF)
         }
         super.render(matrices, mouseX, mouseY, delta)
+        matrices.pop()
     }
 
 

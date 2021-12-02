@@ -1,5 +1,6 @@
 package io.github.lucaargolo.lifts.common.block.screen
 
+import io.github.lucaargolo.lifts.Lifts
 import io.github.lucaargolo.lifts.common.blockentity.screen.ScreenBlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gl.Framebuffer
@@ -17,8 +18,8 @@ object ScreenBlockHandler {
 
     var screenFramebuffer: Framebuffer? = null
 
-    fun setupFramebuffer(width: Int, height: Int) {
-        screenFramebuffer = SimpleFramebuffer(width, height, false, MinecraftClient.IS_SYSTEM_MAC)
+    fun setupFramebuffer() {
+        screenFramebuffer = SimpleFramebuffer(128*Lifts.CONFIG.screenScale, 128*Lifts.CONFIG.screenScale, false, MinecraftClient.IS_SYSTEM_MAC)
     }
 
     fun getFramebufferHeight(): Int {
@@ -76,7 +77,7 @@ object ScreenBlockHandler {
             }
             mouseY = (1-ctxPos.y)*getFramebufferHeight()
         }
-        return Pair(mouseX, mouseY)
+        return Pair(mouseX/Lifts.CONFIG.screenScale, mouseY/Lifts.CONFIG.screenScale)
     }
 
 }
