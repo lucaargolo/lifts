@@ -50,6 +50,7 @@ class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockE
                 LinkActionResult.TOO_FAR_AWAY
             }else {
                 linkedLift = it
+                markDirty()
                 LinkActionResult.SUCCESSFUL
             }
         } ?: LinkActionResult.NOT_LIFT
