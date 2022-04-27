@@ -45,7 +45,7 @@ class ScreenBlockEntity(pos: BlockPos, state: BlockState): SynchronizeableBlockE
 
     override fun link(blockPos: BlockPos): LinkActionResult{
         return (world?.getBlockEntity(blockPos) as? LiftBlockEntity)?.let {
-            val distance = MathHelper.sqrt(blockPos.getSquaredDistance(pos.x+0.0, pos.y+0.0, pos.z+0.0, true).toFloat())
+            val distance = MathHelper.sqrt(blockPos.getSquaredDistance(pos.x+0.0, pos.y+0.0, pos.z+0.0).toFloat())
             if(distance > MAX_LIFT_DISTANCE) {
                 LinkActionResult.TOO_FAR_AWAY
             }else {

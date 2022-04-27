@@ -7,10 +7,8 @@ import io.github.lucaargolo.lifts.common.blockentity.lift.StirlingLiftBlockEntit
 import io.github.lucaargolo.lifts.common.containers.lift.ElectricLiftScreenHandler
 import io.github.lucaargolo.lifts.common.containers.lift.StirlingLiftScreenHandler
 import io.github.lucaargolo.lifts.utils.RegistryCompendium
-import net.fabricmc.fabric.api.client.screenhandler.v1.ScreenRegistry
-import net.fabricmc.fabric.impl.screenhandler.ExtendedScreenHandlerType
-import net.minecraft.client.gui.screen.ingame.HandledScreen
-import net.minecraft.screen.ScreenHandler
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType
+import net.minecraft.client.gui.screen.ingame.HandledScreens
 import net.minecraft.screen.ScreenHandlerContext
 import net.minecraft.screen.ScreenHandlerType
 import net.minecraft.util.registry.Registry
@@ -35,8 +33,8 @@ object ScreenHandlerCompendium: RegistryCompendium<ScreenHandlerType<*>>(Registr
 
     @Suppress("UNCHECKED_CAST")
     fun onInitializeClient() {
-        ScreenRegistry.register(STIRLING_LIFT_TYPE) { handler, playerInventory, title -> StirlingLiftScreen(handler as StirlingLiftScreenHandler, playerInventory, title) as HandledScreen<ScreenHandler>}
-        ScreenRegistry.register(ELECTRIC_LIFT_TYPE) { handler, playerInventory, title -> ElectricLiftScreen(handler as ElectricLiftScreenHandler, playerInventory, title) as HandledScreen<ScreenHandler>}
+        HandledScreens.register(STIRLING_LIFT_TYPE, ::StirlingLiftScreen)
+        HandledScreens.register(ELECTRIC_LIFT_TYPE, ::ElectricLiftScreen)
     }
 
 }

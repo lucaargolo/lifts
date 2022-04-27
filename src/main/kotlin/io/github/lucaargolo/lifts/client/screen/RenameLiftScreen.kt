@@ -28,7 +28,7 @@ class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(TranslatableTex
             passedData.writeBlockPos(blockEntity.pos)
             passedData.writeString(nameField?.text)
             ClientPlayNetworking.send(PacketCompendium.RENAME_LIFT_ENTITY, passedData)
-            onClose()
+            close()
         }
         this.addDrawableChild(setButton)
     }
@@ -57,6 +57,6 @@ class RenameLiftScreen(val blockEntity: LiftBlockEntity): Screen(TranslatableTex
         }
     }
 
-    override fun isPauseScreen() = false
+    override fun shouldPause() = false
 
 }

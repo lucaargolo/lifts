@@ -20,8 +20,8 @@ class UnlinkedScreen: Screen(TranslatableText("screen.lifts.title.unlinked")) {
 
         val finalText = if(splitStringArray.size == 4) {
             val client = MinecraftClient.getInstance()
-            val sneakKey = client.options.keySneak
-            val useKey = client.options.keyUse
+            val sneakKey = client.options.sneakKey
+            val useKey = client.options.useKey
             LiteralText(splitStringArray[0]).formatted(Formatting.BLUE)
                 .append(TranslatableText(sneakKey.boundKeyTranslationKey).formatted(Formatting.GRAY))
                 .append(LiteralText(splitStringArray[1]).formatted(Formatting.BLUE))

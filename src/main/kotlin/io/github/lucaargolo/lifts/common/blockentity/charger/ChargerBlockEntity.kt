@@ -29,7 +29,7 @@ class ChargerBlockEntity(pos: BlockPos, state: BlockState): BlockEntity(BlockEnt
 
     override fun link(blockPos: BlockPos): LinkActionResult {
         return (world?.getBlockEntity(blockPos) as? ScreenBlockEntity)?.let {
-            val distance = MathHelper.sqrt(blockPos.getSquaredDistance(pos.x+0.0, pos.y+0.0, pos.z+0.0, true).toFloat())
+            val distance = MathHelper.sqrt(blockPos.getSquaredDistance(pos.x+0.0, pos.y+0.0, pos.z+0.0).toFloat())
             if(distance > MAX_SCREEN_DISTANCE) {
                 LinkActionResult.TOO_FAR_AWAY
             }else {

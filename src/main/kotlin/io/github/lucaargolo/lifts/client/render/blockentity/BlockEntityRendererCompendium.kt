@@ -3,21 +3,19 @@ package io.github.lucaargolo.lifts.client.render.blockentity
 import io.github.lucaargolo.lifts.client.render.blockentity.screen.ScreenBlockEntityRenderer
 import io.github.lucaargolo.lifts.common.blockentity.BlockEntityCompendium
 import io.github.lucaargolo.lifts.utils.GenericCompendium
-import net.fabricmc.fabric.api.client.rendereregistry.v1.BlockEntityRendererRegistry
+import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.block.entity.BlockEntityType
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher
-import net.minecraft.client.render.block.entity.BlockEntityRenderer
-import java.util.function.Function
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
 
-object BlockEntityRendererCompendium: GenericCompendium<Function<BlockEntityRenderDispatcher, BlockEntityRenderer<*>>>() {
+object BlockEntityRendererCompendium: GenericCompendium<BlockEntityRendererFactory<*>>() {
 
-    val SCREEN_FACTORY = register("screen") { ScreenBlockEntityRenderer(it) }
+    val SCREEN_FACTORY = register("screen", BlockEntityRendererFactory { ScreenBlockEntityRenderer(it.renderDispatcher) })
 
     @Suppress("UNCHECKED_CAST")
     override fun initialize() {
         map.forEach { (entityIdentifier, renderFactory) ->
-            BlockEntityRendererRegistry.INSTANCE.register(BlockEntityCompendium.get(entityIdentifier) as BlockEntityType<BlockEntity>) {context -> renderFactory.apply(context.renderDispatcher) as BlockEntityRenderer<BlockEntity>}
+            BlockEntityRendererRegistry.register(BlockEntityCompendium.get(entityIdentifier) as BlockEntityType<BlockEntity>, renderFactory as BlockEntityRendererFactory<BlockEntity>)
         }
     }
 

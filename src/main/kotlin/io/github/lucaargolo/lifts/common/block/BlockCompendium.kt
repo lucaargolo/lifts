@@ -101,7 +101,7 @@ object BlockCompendium: RegistryCompendium<Block>(Registry.BLOCK) {
 
     fun displayHiddenTooltip(tooltip: MutableList<Text>, runnable: Runnable) {
         val client = MinecraftClient.getInstance()
-        val sneakKey = client.options.keySneak
+        val sneakKey = client.options.sneakKey
         val sneak = InputUtil.isKeyPressed(client.window.handle, (sneakKey as KeyBindingAccessor).boundKey.code)
         if (!sneak) {
             val text = TranslatableText("tooltip.lifts.sneak_for_more")

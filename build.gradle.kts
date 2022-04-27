@@ -99,8 +99,8 @@ dependencies {
 
     modCompileOnly ("net.oskarstrom:DashLoader:${project["dashloader_version"]}") {}
 
-    modRuntime("com.terraformersmc:modmenu:${project["modmenu_version"]}")
-    modRuntime("me.shedaniel:RoughlyEnoughItems-fabric:${project["rei_version"]}")
+    modRuntimeOnly("com.terraformersmc:modmenu:${project["modmenu_version"]}")
+    modRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project["rei_version"]}")
 }
 
 tasks.processResources {
